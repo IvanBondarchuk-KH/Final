@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    PS Lounge Game | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section
+        class="game-page"
+        data-game
+        data-score-url="{% url 'main:save_game_score' %}"
+        data-csrf-token="{{ csrf_token }}"
+    >
+        <div class="container">
+            <div class="game-page__header">
+                <div>
+                    <span class="game-page__eyebrow">PS Lounge Arcade</span>
+                    <h1 class="game-page__title">Neon Reflex</h1>
+                    <p class="game-page__description">
+                        Test your reaction speed, earn points and compete for a place on the PS Lounge leaderboard.
+                    </p>
+                </div>
+
+                <a class="button button--secondary" href="{% url 'main:leaderboard' %}">
+                    <i class="fa-solid fa-trophy"></i>
+                    Leaderboard
+                </a>
+            </div>
+
+            <div class="game-layout">
+                <main class="game-card">
+                    <div class="game-card__top">
+                        <div class="game-card__player">
+                            <div class="game-card__avatar">
+                                {% if request.user.profile.avatar %}
+                                    <img src="{{ request.user.profile.avatar.url }}" alt="{{ request.user.username }}">
+                                {% else %}
+                                    {{ request.user.username|first|upper }}
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <span>Player</span>
+                                <strong>{{ request.user.username }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="game-card__status">
+                            <span id="game-status" class="game-status game-status--ready">
+                                Ready
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="game-stats">
+                        <div class="game-stat">
+                            <span>Score</span>
+                            <strong id="game-score">0</strong>
+                        </div>
+
+                        <div class="game-stat">
+                            <span>Level</span>
+                            <strong id="game-level">1</strong>
+                        </div>
+
+                        <div class="game-stat">
+                            <span>Time</span>
+                            <strong><span id="game-time">30</span>s</strong>
+                        </div>
+                    </div>
+
+                    <div class="game-arena" id="game-arena">
+                        <div class="game-arena__overlay" id="game-overlay">
+                            <div class="game-arena__intro">
+                                <div class="game-arena__icon">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+
+                                <span>Reflex Challenge</span>
+                                <h2>Hit The Target</h2>
+                                <p>
+                                    Click the target as quickly as possible. Every successful hit gives you points.
+                                </p>
+
+                                <button class="button button--primary" id="game-start" type="button">
+                                    <i class="fa-solid fa-play"></i>
+                                    Start Game
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="game-target" id="game-target" type="button" aria-label="Game target" hidden>
+                            <i class="fa-solid fa-crosshairs"></i>
+                        </button>
+                    </div>
+
+                    <div class="game-controls">
+                        <div class="game-controls__hint">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <span id="game-hint">Press Start Game when you're ready.</span>
+                        </div>
+
+                        <button class="button button--danger" id="game-stop" type="button" disabled>
+                            <i class="fa-solid fa-stop"></i>
+                            Stop Game
+                        </button>
+                    </div>
+
+                    <div class="game-result" id="game-result" hidden>
+                        <div class="game-result__icon">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+
+                        <span>Game Over</span>
+                        <h2>Your Final Score</h2>
+                        <strong id="final-score">0</strong>
+
+                        <div class="game-result__stats">
+                            <div>
+                                <span>Level</span>
+                                <strong id="final-level">1</strong>
+                            </div>
+
+                            <div>
+                                <span>Time</span>
+                                <strong><span id="final-time">30</span> sec</strong>
+                            </div>
+                        </div>
+
+                        <div class="game-result__actions">
+                            <button class="button button--primary" id="game-restart" type="button">
+                                <i class="fa-solid fa-rotate-right"></i>
+                                Play Again
+                            </button>
+
+                            <a class="button button--secondary" href="{% url 'main:leaderboard' %}">
+                                <i class="fa-solid fa-trophy"></i>
+                                View Leaderboard
+                            </a>
+                        </div>
+                    </div>
+                </main>
+
+                <aside class="game-info">
+                    <div class="game-info__header">
+                        <span>How To Play</span>
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+
+                    <div class="game-info__steps">
+                        <div class="game-info__step">
+                            <span>01</span>
+                            <div>
+                                <h3>Start</h3>
+                                <p>Press Start Game to begin the challenge.</p>
+                            </div>
+                        </div>
+
+                        <div class="game-info__step">
+                            <span>02</span>
+                            <div>
+                                <h3>React</h3>
+                                <p>Find and click the target inside the arena.</p>
+                            </div>
+                        </div>
+
+                        <div class="game-info__step">
+                            <span>03</span>
+                            <div>
+                                <h3>Score</h3>
+                                <p>Faster hits give you more opportunities to increase your score.</p>
+                            </div>
+                        </div>
+
+                        <div class="game-info__step">
+                            <span>04</span>
+                            <div>
+                                <h3>Compete</h3>
+                                <p>Your result is saved to the leaderboard.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-info__divider"></div>
+
+                    <div class="game-info__leaderboard">
+                        <div>
+                            <i class="fa-solid fa-ranking-star"></i>
+                            <span>Want To Compete?</span>
+                        </div>
+
+                        <p>Play again and try to beat your personal best.</p>
+
+                        <a href="{% url 'main:leaderboard' %}">
+                            Open Leaderboard
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+    {% load static %}
+    <script src="{% static 'js/game.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Leaderboard | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="leaderboard-page">
+        <div class="container">
+            <header class="leaderboard-page__header">
+                <div class="leaderboard-page__heading">
+                    <span class="leaderboard-page__eyebrow">PS Lounge Arcade</span>
+                    <h1 class="leaderboard-page__title">Leaderboard</h1>
+                    <p class="leaderboard-page__description">
+                        The best players. The highest scores. Can you make it to the top?
+                    </p>
+                </div>
+
+                <a class="button button--primary" href="{% url 'main:game' %}">
+                    <i class="fa-solid fa-gamepad"></i>
+                    Play Game
+                </a>
+            </header>
+
+            {% if leaderboard %}
+                {% with first=leaderboard.0 second=leaderboard.1 third=leaderboard.2 %}
+                    {% if leaderboard|length >= 3 %}
+                        <section class="leaderboard-podium">
+                            <article class="podium-card podium-card--second">
+                                <div class="podium-card__rank">2</div>
+                                <div class="podium-card__avatar">
+                                    {% if second.user.profile.avatar %}
+                                        <img src="{{ second.user.profile.avatar.url }}" alt="{{ second.user.username }}">
+                                    {% else %}
+                                        {{ second.user.username|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <span class="podium-card__label">Runner Up</span>
+                                <h2 class="podium-card__username">{{ second.user.username }}</h2>
+                                <strong class="podium-card__score">{{ second.best_score }}</strong>
+                                <span class="podium-card__score-label">points</span>
+                            </article>
+
+                            <article class="podium-card podium-card--first">
+                                <div class="podium-card__crown">
+                                    <i class="fa-solid fa-crown"></i>
+                                </div>
+                                <div class="podium-card__rank">1</div>
+                                <div class="podium-card__avatar">
+                                    {% if first.user.profile.avatar %}
+                                        <img src="{{ first.user.profile.avatar.url }}" alt="{{ first.user.username }}">
+                                    {% else %}
+                                        {{ first.user.username|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <span class="podium-card__label">Champion</span>
+                                <h2 class="podium-card__username">{{ first.user.username }}</h2>
+                                <strong class="podium-card__score">{{ first.best_score }}</strong>
+                                <span class="podium-card__score-label">points</span>
+                            </article>
+
+                            <article class="podium-card podium-card--third">
+                                <div class="podium-card__rank">3</div>
+                                <div class="podium-card__avatar">
+                                    {% if third.user.profile.avatar %}
+                                        <img src="{{ third.user.profile.avatar.url }}" alt="{{ third.user.username }}">
+                                    {% else %}
+                                        {{ third.user.username|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <span class="podium-card__label">Top Player</span>
+                                <h2 class="podium-card__username">{{ third.user.username }}</h2>
+                                <strong class="podium-card__score">{{ third.best_score }}</strong>
+                                <span class="podium-card__score-label">points</span>
+                            </article>
+                        </section>
+                    {% endif %}
+                {% endwith %}
+
+                <section class="leaderboard-table-section">
+                    <div class="section-header">
+                        <span class="section-header__subtitle">Rankings</span>
+                        <h2 class="section-header__title">Top Players</h2>
+                        <p class="section-header__description">Players ranked by their best game score.</p>
+                    </div>
+
+                    <div class="leaderboard-table-wrapper">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Best Score</th>
+                                    <th>Level</th>
+                                    <th>Last Played</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for player in leaderboard %}
+                                    <tr class="{% if player.user == request.user %}leaderboard-table__row--current{% endif %}">
+                                        <td>
+                                            <div class="leaderboard-table__rank">
+                                                {% if forloop.counter == 1 %}
+                                                    <i class="fa-solid fa-crown"></i>
+                                                {% elif forloop.counter == 2 %}
+                                                    <i class="fa-solid fa-medal"></i>
+                                                {% elif forloop.counter == 3 %}
+                                                    <i class="fa-solid fa-medal"></i>
+                                                {% else %}
+                                                    {{ forloop.counter }}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="leaderboard-table__player">
+                                                <div class="leaderboard-table__avatar">
+                                                    {% if player.user.profile.avatar %}
+                                                        <img src="{{ player.user.profile.avatar.url }}" alt="{{ player.user.username }}">
+                                                    {% else %}
+                                                        {{ player.user.username|first|upper }}
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <strong>{{ player.user.username }}</strong>
+                                                    {% if player.user == request.user %}
+                                                        <span>You</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong class="leaderboard-table__score">{{ player.score }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="leaderboard-table__level">Level {{ player.level }}</span>
+                                        </td>
+                                        <td>
+                                            <time>{{ player.created_at|date:"d.m.Y H:i" }}</time>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="leaderboard-empty">
+                    <div class="leaderboard-empty__icon">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <span>No Rankings Yet</span>
+                    <h2>Be The First Champion</h2>
+                    <p>
+                        There are no game scores yet. Start playing and claim the first place.
+                    </p>
+                    <a class="button button--primary" href="{% url 'main:game' %}">
+                        <i class="fa-solid fa-play"></i>
+                        Start Playing
+                    </a>
+                </section>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <section class="leaderboard-cta">
+                    <div class="leaderboard-cta__content">
+                        <span>Ready For Another Round?</span>
+                        <h2>Beat Your High Score.</h2>
+                        <p>Every game is another chance to climb the PS Lounge rankings.</p>
+                    </div>
+
+                    <a class="button button--primary" href="{% url 'main:game' %}">
+                        Play Neon Reflex
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </section>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

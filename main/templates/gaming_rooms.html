@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Gaming Rooms | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="catalog-hero">
+        <div class="container">
+            <div class="catalog-hero__content">
+                <span class="catalog-hero__subtitle">PS Lounge Collection</span>
+                <h1 class="catalog-hero__title">
+                    Find Your <span>Gaming Room.</span>
+                </h1>
+                <p class="catalog-hero__description">
+                    Explore our premium Gaming Rooms and find the perfect setup for your next session.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="catalog">
+        <div class="container">
+            <div class="catalog__toolbar">
+                <form class="catalog__filters" method="get">
+                    <div class="catalog__search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input
+                            type="search"
+                            name="search"
+                            value="{{ request.GET.search }}"
+                            placeholder="Search Gaming Rooms..."
+                            aria-label="Search Gaming Rooms"
+                        >
+                    </div>
+
+                    <div class="catalog__select">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.slug }}" {% if request.GET.category == category.slug %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="catalog__select">
+                        <label for="availability">Availability</label>
+                        <select id="availability" name="availability">
+                            <option value="">All Rooms</option>
+                            <option value="available" {% if request.GET.availability == "available" %}selected{% endif %}>
+                                Available
+                            </option>
+                            <option value="unavailable" {% if request.GET.availability == "unavailable" %}selected{% endif %}>
+                                Unavailable
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="catalog__select">
+                        <label for="sort">Sort By</label>
+                        <select id="sort" name="sort">
+                            <option value="">Recommended</option>
+                            <option value="price_low" {% if request.GET.sort == "price_low" %}selected{% endif %}>
+                                Price: Low to High
+                            </option>
+                            <option value="price_high" {% if request.GET.sort == "price_high" %}selected{% endif %}>
+                                Price: High to Low
+                            </option>
+                            <option value="rating" {% if request.GET.sort == "rating" %}selected{% endif %}>
+                                Highest Rated
+                            </option>
+                            <option value="name" {% if request.GET.sort == "name" %}selected{% endif %}>
+                                Name
+                            </option>
+                        </select>
+                    </div>
+
+                    <button class="button button--primary" type="submit">
+                        Apply Filters
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="catalog__header">
+                <div>
+                    <span class="catalog__eyebrow">Our Gaming Rooms</span>
+                    <h2 class="catalog__title">Choose Your Setup</h2>
+                </div>
+
+                <span class="catalog__count">
+                    {{ gaming_rooms|length }}
+                    {% if gaming_rooms|length == 1 %}room{% else %}rooms{% endif %}
+                </span>
+            </div>
+
+            <div class="rooms-grid">
+                {% for room in gaming_rooms %}
+                    <article class="room-card">
+                        <div class="room-card__image">
+                            <a href="{% url 'main:gaming_room_detail' room.slug %}">
+                                {% if room.image %}
+                                    <img src="{{ room.image.url }}" alt="{{ room.title }}">
+                                {% else %}
+                                    <div class="image-placeholder">
+                                        <i class="fa-solid fa-gamepad"></i>
+                                        <span>{{ room.title }}</span>
+                                    </div>
+                                {% endif %}
+                            </a>
+
+                            <span class="room-card__category">{{ room.category.name }}</span>
+
+                            {% if room.is_available %}
+                                <span class="room-card__availability room-card__availability--available">
+                                    <span></span> Available
+                                </span>
+                            {% else %}
+                                <span class="room-card__availability room-card__availability--unavailable">
+                                    <span></span> Unavailable
+                                </span>
+                            {% endif %}
+
+                            {% if user.is_authenticated %}
+                                <form class="room-card__favorite" method="post" action="{% url 'main:favorite_toggle' room.slug %}">
+                                    {% csrf_token %}
+                                    {% if room.id in favorite_room_ids %}
+                                        <button type="submit" aria-label="Remove {{ room.title }} from favorites">
+                                            <i class="fa-solid fa-heart"></i>
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" aria-label="Add {{ room.title }} to favorites">
+                                            <i class="fa-regular fa-heart"></i>
+                                        </button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </div>
+
+                        <div class="room-card__content">
+                            <div class="room-card__header">
+                                <div>
+                                    <span class="room-card__number">
+                                        ROOM {{ room.room_number|stringformat:"02d" }}
+                                    </span>
+                                    <h3 class="room-card__title">{{ room.title }}</h3>
+                                </div>
+
+                                <div class="room-card__rating">
+                                    <i class="fa-solid fa-star"></i>
+                                    <strong>{{ room.rating }}</strong>
+                                </div>
+                            </div>
+
+                            {% if room.description %}
+                                <p class="room-card__description">
+                                    {{ room.description|truncatewords:22 }}
+                                </p>
+                            {% endif %}
+
+                            <div class="room-card__features">
+                                <span>
+                                    <i class="fa-solid fa-gamepad"></i>
+                                    {% if room.ps5_pro %}PS5 Pro{% else %}PS5{% endif %}
+                                </span>
+                                <span>
+                                    <i class="fa-solid fa-tv"></i>
+                                    {{ room.tv_size }}" 4K
+                                </span>
+                                <span>
+                                    <i class="fa-solid fa-users"></i>
+                                    {{ room.max_players }}
+                                </span>
+                            </div>
+
+                            <div class="room-card__features">
+                                <span>
+                                    <i class="fa-solid fa-wifi"></i>
+                                    {{ room.internet_speed }}
+                                </span>
+                                <span>
+                                    <i class="fa-solid fa-gamepad"></i>
+                                    {{ room.controllers }} Controllers
+                                </span>
+                                {% if room.vr_available %}
+                                    <span>
+                                        <i class="fa-solid fa-vr-cardboard"></i> VR
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="room-card__footer">
+                                <div class="room-card__price">
+                                    <strong>{{ room.price_per_hour }}</strong>
+                                    <span>/ hour</span>
+                                </div>
+
+                                <a class="button button--small button--primary" href="{% url 'main:gaming_room_detail' room.slug %}">
+                                    View Room <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="catalog__empty">
+                        <div class="catalog__empty-icon">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+                        <span class="catalog__empty-subtitle">Nothing Found</span>
+                        <h3 class="catalog__empty-title">No Gaming Rooms Match Your Search</h3>
+                        <p class="catalog__empty-description">
+                            Try changing your search or filters to discover available Gaming Rooms.
+                        </p>
+                        <a class="button button--secondary" href="{% url 'main:gaming_rooms' %}">
+                            Clear Filters
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if is_paginated %}
+                <nav class="pagination" aria-label="Gaming Rooms pagination">
+                    {% if page_obj.has_previous %}
+                        <a class="pagination__link pagination__link--previous" href="?page={{ page_obj.previous_page_number }}">
+                            <i class="fa-solid fa-arrow-left"></i> Previous
+                        </a>
+                    {% endif %}
+
+                    <div class="pagination__pages">
+                        {% for page_number in page_obj.paginator.page_range %}
+                            {% if page_number == page_obj.number %}
+                                <span class="pagination__link pagination__link--active">
+                                    {{ page_number }}
+                                </span>
+                            {% else %}
+                                <a class="pagination__link" href="?page={{ page_number }}">
+                                    {{ page_number }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    {% if page_obj.has_next %}
+                        <a class="pagination__link pagination__link--next" href="?page={{ page_obj.next_page_number }}">
+                            Next <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="catalog-cta">
+        <div class="container">
+            <div class="catalog-cta__content">
+                <span class="catalog-cta__subtitle">Ready To Play?</span>
+                <h2 class="catalog-cta__title">
+                    Your Next Gaming Session Starts Here.
+                </h2>
+                <p class="catalog-cta__description">
+                    Choose your room, pick your game, select your time and enjoy the experience.
+                </p>
+
+                {% if user.is_authenticated %}
+                    <a class="button button--primary" href="{% url 'main:profile' %}">
+                        Go To Profile <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                {% else %}
+                    <a class="button button--primary" href="{% url 'main:register' %}">
+                        Create Your Account <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

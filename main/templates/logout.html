@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Logout | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="auth-page logout-page">
+        <div class="container">
+            <div class="auth-card logout-card">
+                <div class="auth-card__icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+
+                <span class="auth-card__eyebrow">PS Lounge Account</span>
+                <h1 class="auth-card__title">Sign Out</h1>
+
+                <p class="auth-card__description">
+                    Are you sure you want to log out of your PS Lounge account?
+                </p>
+
+                <div class="logout-card__actions">
+                    <form method="post" action="{% url 'main:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="button button--primary button--full">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Log Out
+                        </button>
+                    </form>
+
+                    <a href="{% url 'main:profile' %}" class="button button--secondary button--full">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Stay Logged In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

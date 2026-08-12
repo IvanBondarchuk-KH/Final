@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Book {{ gaming_room.title }} | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="booking-page">
+        <div class="container">
+            <div class="booking-page__header">
+                <div>
+                    <span class="booking-page__eyebrow">Reservation</span>
+                    <h1 class="booking-page__title">Book Your Gaming Session</h1>
+                    <p class="booking-page__description">
+                        Choose your game, date and time to reserve {{ gaming_room.title }}.
+                    </p>
+                </div>
+
+                <a class="button button--secondary" href="{% url 'main:gaming_room_detail' gaming_room.slug %}">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back To Room
+                </a>
+            </div>
+
+            <div class="booking-page__grid">
+                <main class="booking-form-card">
+                    <div class="booking-form-card__header">
+                        <span class="booking-form-card__subtitle">Reservation Details</span>
+                        <h2 class="booking-form-card__title">Configure Your Session</h2>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="form-errors">
+                            <div class="form-errors__icon">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                            </div>
+                            <div>
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form class="booking-form" method="post">
+                        {% csrf_token %}
+
+                        <div class="booking-form__section">
+                            <div class="booking-form__section-header">
+                                <span>01</span>
+                                <div>
+                                    <h3>Select Your Game</h3>
+                                    <p>Choose one of the games available in this room.</p>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.selected_game.id_for_label }}">
+                                    Game
+                                </label>
+                                <div class="form-field__input-wrapper">
+                                    <i class="fa-solid fa-gamepad"></i>
+                                    {{ form.selected_game }}
+                                </div>
+                                {% if form.selected_game.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.selected_game.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="booking-form__section">
+                            <div class="booking-form__section-header">
+                                <span>02</span>
+                                <div>
+                                    <h3>Choose Date</h3>
+                                    <p>Select the day of your gaming session.</p>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.booking_date.id_for_label }}">
+                                    Booking Date
+                                </label>
+                                <div class="form-field__input-wrapper">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    {{ form.booking_date }}
+                                </div>
+                                {% if form.booking_date.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.booking_date.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="booking-form__section">
+                            <div class="booking-form__section-header">
+                                <span>03</span>
+                                <div>
+                                    <h3>Choose Time</h3>
+                                    <p>Set the start and end time for your session.</p>
+                                </div>
+                            </div>
+
+                            <div class="booking-form__fields-grid">
+                                <div class="form-field">
+                                    <label class="form-field__label" for="{{ form.start_time.id_for_label }}">
+                                        Start Time
+                                    </label>
+                                    <div class="form-field__input-wrapper">
+                                        <i class="fa-regular fa-clock"></i>
+                                        {{ form.start_time }}
+                                    </div>
+                                    {% if form.start_time.errors %}
+                                        <div class="form-field__errors">
+                                            {% for error in form.start_time.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-field__label" for="{{ form.end_time.id_for_label }}">
+                                        End Time
+                                    </label>
+                                    <div class="form-field__input-wrapper">
+                                        <i class="fa-regular fa-clock"></i>
+                                        {{ form.end_time }}
+                                    </div>
+                                    {% if form.end_time.errors %}
+                                        <div class="form-field__errors">
+                                            {% for error in form.end_time.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="booking-form__section">
+                            <div class="booking-form__section-header">
+                                <span>04</span>
+                                <div>
+                                    <h3>Session Duration</h3>
+                                    <p>Select how long you want to stay.</p>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.hours.id_for_label }}">
+                                    Hours
+                                </label>
+                                <div class="form-field__input-wrapper">
+                                    <i class="fa-solid fa-hourglass-half"></i>
+                                    {{ form.hours }}
+                                </div>
+                                {% if form.hours.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.hours.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="booking-form__actions">
+                            <a class="button button--secondary" href="{% url 'main:gaming_room_detail' gaming_room.slug %}">
+                                Cancel
+                            </a>
+                            <button class="button button--primary" type="submit">
+                                Continue To Confirmation
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </main>
+
+                <aside class="booking-summary">
+                    <div class="booking-summary__image">
+                        {% if gaming_room.image %}
+                            <img src="{{ gaming_room.image.url }}" alt="{{ gaming_room.title }}">
+                        {% else %}
+                            <div class="image-placeholder">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="booking-summary__content">
+                        <span class="booking-summary__category">{{ gaming_room.category.name }}</span>
+                        <h2 class="booking-summary__title">{{ gaming_room.title }}</h2>
+
+                        <div class="booking-summary__rating">
+                            <i class="fa-solid fa-star"></i>
+                            <strong>{{ gaming_room.rating }}</strong>
+                            <span>{{ gaming_room.reviews_count }} reviews</span>
+                        </div>
+
+                        <div class="booking-summary__divider"></div>
+
+                        <div class="booking-summary__specifications">
+                            <div>
+                                <i class="fa-solid fa-gamepad"></i>
+                                <span>
+                                    {% if gaming_room.ps5_pro %}
+                                        PlayStation 5 Pro
+                                    {% else %}
+                                        PlayStation 5
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-tv"></i>
+                                <span>{{ gaming_room.tv_size }}" Display</span>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-users"></i>
+                                <span>Up to {{ gaming_room.max_players }} Players</span>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-wifi"></i>
+                                <span>{{ gaming_room.internet_speed }}</span>
+                            </div>
+                        </div>
+
+                        <div class="booking-summary__price">
+                            <span>Starting From</span>
+                            <strong>{{ gaming_room.price_per_hour }}</strong>
+                            <small>/ hour</small>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/booking.js' %}"></script>
+{% endblock %}

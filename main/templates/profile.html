@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Profile | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="profile-page">
+        <div class="container">
+            <div class="profile-page__header">
+                <div class="profile-page__identity">
+                    <div class="profile-page__avatar">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="{{ user.username }}">
+                        {% else %}
+                            <span>{{ user.username|first|upper }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-page__identity-content">
+                        <span class="profile-page__eyebrow">PS Lounge Member</span>
+
+                        <h1 class="profile-page__title">
+                            {{ user.username }}
+                        </h1>
+
+                        <p class="profile-page__username">@{{ user.username }}</p>
+
+                        {% if profile.city %}
+                            <span class="profile-page__location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                {{ profile.city }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="profile-page__actions">
+                    <a class="button button--primary" href="{% url 'main:profile_edit' %}">
+                        <i class="fa-solid fa-pen"></i>
+                        Edit Profile
+                    </a>
+
+                    <a class="button button--secondary" href="{% url 'main:change_password' %}">
+                        <i class="fa-solid fa-lock"></i>
+                        Change Password
+                    </a>
+                </div>
+            </div>
+
+            <div class="profile-page__grid">
+                <main class="profile-page__main">
+                    <section class="profile-card">
+                        <div class="profile-card__header">
+                            <div>
+                                <span class="profile-card__subtitle">Personal Information</span>
+                                <h2 class="profile-card__title">About You</h2>
+                            </div>
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+
+                        <div class="profile-info-grid">
+                            <div class="profile-info">
+                                <span class="profile-info__label">Username</span>
+                                <strong>{{ user.username }}</strong>
+                            </div>
+
+                            <div class="profile-info">
+                                <span class="profile-info__label">Email</span>
+                                <strong>{{ user.email|default:"Not provided" }}</strong>
+                            </div>
+
+                            <div class="profile-info">
+                                <span class="profile-info__label">Phone</span>
+                                <strong>{{ profile.phone|default:"Not provided" }}</strong>
+                            </div>
+
+                            <div class="profile-info">
+                                <span class="profile-info__label">Date of Birth</span>
+                                <strong>
+                                    {% if profile.date_of_birth %}
+                                        {{ profile.date_of_birth|date:"d.m.Y" }}
+                                    {% else %}
+                                        Not provided
+                                    {% endif %}
+                                </strong>
+                            </div>
+
+                            <div class="profile-info">
+                                <span class="profile-info__label">City</span>
+                                <strong>{{ profile.city|default:"Not provided" }}</strong>
+                            </div>
+
+                            <div class="profile-info">
+                                <span class="profile-info__label">Favorite Game</span>
+                                <strong>
+                                    {% if profile.favorite_game %}
+                                        {{ profile.favorite_game.title }}
+                                    {% else %}
+                                        Not selected
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+
+                        {% if profile.bio %}
+                            <div class="profile-bio">
+                                <span class="profile-info__label">Bio</span>
+                                <p>{{ profile.bio }}</p>
+                            </div>
+                        {% endif %}
+                    </section>
+
+                    <section class="profile-card">
+                        <div class="profile-card__header">
+                            <div>
+                                <span class="profile-card__subtitle">Your Activity</span>
+                                <h2 class="profile-card__title">Recent Bookings</h2>
+                            </div>
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+
+                        {% if bookings %}
+                            <div class="profile-bookings">
+                                {% for booking in bookings|slice:":5" %}
+                                    <article class="profile-booking">
+                                        <div class="profile-booking__room">
+                                            <div class="profile-booking__image">
+                                                {% if booking.gaming_room.image %}
+                                                    <img src="{{ booking.gaming_room.image.url }}" alt="{{ booking.gaming_room.title }}">
+                                                {% else %}
+                                                    <i class="fa-solid fa-gamepad"></i>
+                                                {% endif %}
+                                            </div>
+
+                                            <div>
+                                                <h3>{{ booking.gaming_room.title }}</h3>
+                                                <span>{{ booking.selected_game.title }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="profile-booking__date">
+                                            <span>{{ booking.booking_date|date:"d.m.Y" }}</span>
+                                            <strong>
+                                                {{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}
+                                            </strong>
+                                        </div>
+
+                                        <div class="profile-booking__status">
+                                            {% if booking.booking_status == "confirmed" %}
+                                                <span class="status status--success">Confirmed</span>
+                                            {% elif booking.booking_status == "pending" %}
+                                                <span class="status status--warning">Pending</span>
+                                            {% elif booking.booking_status == "completed" %}
+                                                <span class="status status--info">Completed</span>
+                                            {% else %}
+                                                <span class="status status--danger">Cancelled</span>
+                                            {% endif %}
+                                        </div>
+
+                                        <a class="profile-booking__link" href="{% url 'main:booking_detail' booking.id %}">
+                                            <i class="fa-solid fa-arrow-right"></i>
+                                        </a>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="profile-empty">
+                                <i class="fa-regular fa-calendar-xmark"></i>
+                                <h3>No Bookings Yet</h3>
+                                <p>Your Gaming Room bookings will appear here.</p>
+                                <a class="button button--primary" href="{% url 'main:gaming_rooms' %}">
+                                    Explore Gaming Rooms
+                                </a>
+                            </div>
+                        {% endif %}
+                    </section>
+
+                    <section class="profile-card">
+                        <div class="profile-card__header">
+                            <div>
+                                <span class="profile-card__subtitle">Your Reviews</span>
+                                <h2 class="profile-card__title">Gaming Room Reviews</h2>
+                            </div>
+                            <i class="fa-regular fa-star"></i>
+                        </div>
+
+                        {% if reviews %}
+                            <div class="profile-reviews">
+                                {% for review in reviews|slice:":5" %}
+                                    <article class="profile-review">
+                                        <div class="profile-review__room">
+                                            <h3>{{ review.gaming_room.title }}</h3>
+                                            <span>{{ review.created_at|date:"d.m.Y" }}</span>
+                                        </div>
+
+                                        <div class="profile-review__rating">
+                                            <i class="fa-solid fa-star"></i>
+                                            <strong>{{ review.rating }}</strong>
+                                        </div>
+
+                                        {% if review.comment %}
+                                            <p>{{ review.comment }}</p>
+                                        {% endif %}
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="profile-empty">
+                                <i class="fa-regular fa-star"></i>
+                                <h3>No Reviews Yet</h3>
+                                <p>Share your experience after visiting a Gaming Room.</p>
+                            </div>
+                        {% endif %}
+                    </section>
+                </main>
+
+                <aside class="profile-page__sidebar">
+                    <section class="profile-stat-card">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Total Bookings</span>
+                        <strong>{{ bookings|length }}</strong>
+                    </section>
+
+                    <section class="profile-stat-card">
+                        <i class="fa-solid fa-heart"></i>
+                        <span>Favorite Rooms</span>
+                        <strong>{{ favorites|length }}</strong>
+                        <a href="{% url 'main:favorites' %}">
+                            View Favorites
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </section>
+
+                    <section class="profile-stat-card">
+                        <i class="fa-solid fa-star"></i>
+                        <span>Reviews</span>
+                        <strong>{{ reviews|length }}</strong>
+                    </section>
+
+                    <section class="profile-stat-card">
+                        <i class="fa-solid fa-trophy"></i>
+                        <span>Best Game Score</span>
+                        {% if best_score %}
+                            <strong>{{ best_score.score }}</strong>
+                            <small>Level {{ best_score.level }}</small>
+                        {% else %}
+                            <strong>0</strong>
+                            <small>No scores yet</small>
+                        {% endif %}
+                        <a href="{% url 'main:leaderboard' %}">
+                            View Leaderboard
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </section>
+
+                    <section class="profile-card profile-card--compact">
+                        <div class="profile-card__header">
+                            <div>
+                                <span class="profile-card__subtitle">Quick Access</span>
+                                <h2 class="profile-card__title">PS Lounge</h2>
+                            </div>
+                        </div>
+
+                        <nav class="profile-navigation">
+                            <a href="{% url 'main:gaming_rooms' %}">
+                                <span>
+                                    <i class="fa-solid fa-gamepad"></i>
+                                    Gaming Rooms
+                                </span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+
+                            <a href="{% url 'main:game' %}">
+                                <span>
+                                    <i class="fa-solid fa-bolt"></i>
+                                    Play Game
+                                </span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+
+                            <a href="{% url 'main:leaderboard' %}">
+                                <span>
+                                    <i class="fa-solid fa-trophy"></i>
+                                    Leaderboard
+                                </span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+
+                            <a href="{% url 'main:chat' %}">
+                                <span>
+                                    <i class="fa-solid fa-comments"></i>
+                                    Messages
+                                </span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </nav>
+                    </section>
+
+                    <section class="profile-card profile-card--logout">
+                        <div>
+                            <span class="profile-card__subtitle">Account</span>
+                            <h2 class="profile-card__title">Sign Out</h2>
+                            <p>End your current PS Lounge session.</p>
+                        </div>
+
+                        <form method="post" action="{% url 'main:logout' %}">
+                            {% csrf_token %}
+                            <button class="button button--secondary button--full" type="submit">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                Logout
+                            </button>
+                        </form>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ gaming_room.title }} | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="room-detail-hero">
+        <div class="container">
+            <div class="room-detail-hero__breadcrumbs">
+                <a href="{% url 'main:home' %}">Home</a>
+                <i class="fa-solid fa-chevron-right"></i>
+                <a href="{% url 'main:gaming_rooms' %}">Gaming Rooms</a>
+                <i class="fa-solid fa-chevron-right"></i>
+                <span>{{ gaming_room.title }}</span>
+            </div>
+
+            <div class="room-detail-hero__grid">
+                <div class="room-detail-hero__visual">
+                    {% if gaming_room.image %}
+                        <img src="{{ gaming_room.image.url }}" alt="{{ gaming_room.title }}">
+                    {% else %}
+                        <div class="image-placeholder">
+                            <i class="fa-solid fa-gamepad"></i>
+                            <span>{{ gaming_room.title }}</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="room-detail-hero__badges">
+                        <span class="room-detail-hero__badge">{{ gaming_room.category.name }}</span>
+                        {% if gaming_room.is_available %}
+                            <span class="room-detail-hero__badge room-detail-hero__badge--available">
+                                <span></span> Available
+                            </span>
+                        {% else %}
+                            <span class="room-detail-hero__badge room-detail-hero__badge--unavailable">
+                                <span></span> Currently Unavailable
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="room-detail-hero__content">
+                    <span class="room-detail-hero__room-number">
+                        ROOM {{ gaming_room.room_number|stringformat:"02d" }}
+                    </span>
+
+                    <h1 class="room-detail-hero__title">{{ gaming_room.title }}</h1>
+
+                    <div class="room-detail-hero__rating">
+                        <div class="room-detail-hero__stars">
+                            {% for star in "12345" %}
+                                {% if gaming_room.rating >= forloop.counter %}
+                                    <i class="fa-solid fa-star"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <strong>{{ gaming_room.rating }}</strong>
+                        <span>{{ gaming_room.reviews_count }} reviews</span>
+                    </div>
+
+                    {% if gaming_room.description %}
+                        <p class="room-detail-hero__description">{{ gaming_room.description }}</p>
+                    {% endif %}
+
+                    <div class="room-detail-hero__price">
+                        <strong>{{ gaming_room.price_per_hour }}</strong>
+                        <span>/ hour</span>
+                    </div>
+
+                    <div class="room-detail-hero__actions">
+                        {% if gaming_room.is_available %}
+                            {% if user.is_authenticated %}
+                                <a class="button button--primary" href="{% url 'main:booking_create' gaming_room.slug %}">
+                                    Book This Room <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            {% else %}
+                                <a class="button button--primary" href="{% url 'main:login' %}?next={% url 'main:booking_create' gaming_room.slug %}">
+                                    Login To Book <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <span class="button button--disabled">Currently Unavailable</span>
+                        {% endif %}
+
+                        {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'main:favorite_toggle' gaming_room.slug %}">
+                                {% csrf_token %}
+                                <button class="button button--secondary" type="submit">
+                                    {% if is_favorite %}
+                                        <i class="fa-solid fa-heart"></i> Remove Favorite
+                                    {% else %}
+                                        <i class="fa-regular fa-heart"></i> Add Favorite
+                                    {% endif %}
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="room-specifications">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-header__subtitle">Premium Setup</span>
+                <h2 class="section-header__title">Room Specifications</h2>
+                <p class="section-header__description">Everything you need for a premium gaming experience.</p>
+            </div>
+
+            <div class="specifications-grid">
+                <article class="specification-card">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span>Console</span>
+                    <strong>
+                        {% if gaming_room.ps5_pro %}PlayStation 5 Pro{% else %}PlayStation 5{% endif %}
+                    </strong>
+                </article>
+
+                <article class="specification-card">
+                    <i class="fa-solid fa-tv"></i>
+                    <span>Display</span>
+                    <strong>
+                        {{ gaming_room.tv_size }}"
+                        {% if gaming_room.supports_4k %}4K{% endif %}
+                        {% if gaming_room.supports_hdr %}HDR{% endif %}
+                    </strong>
+                </article>
+
+                <article class="specification-card">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Capacity</span>
+                    <strong>Up to {{ gaming_room.max_players }}</strong>
+                </article>
+
+                <article class="specification-card">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span>Controllers</span>
+                    <strong>{{ gaming_room.controllers }}</strong>
+                </article>
+
+                <article class="specification-card">
+                    <i class="fa-solid fa-wifi"></i>
+                    <span>Internet</span>
+                    <strong>{{ gaming_room.internet_speed }}</strong>
+                </article>
+
+                <article class="specification-card">
+                    <i class="fa-solid fa-vr-cardboard"></i>
+                    <span>VR</span>
+                    <strong>{% if gaming_room.vr_available %}Available{% else %}Not Available{% endif %}</strong>
+                </article>
+
+                <article class="specification-card">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>RGB Lighting</span>
+                    <strong>{% if gaming_room.rgb_lighting %}Available{% else %}Not Available{% endif %}</strong>
+                </article>
+
+                <article class="specification-card">
+                    <i class="fa-solid fa-snowflake"></i>
+                    <span>Air Conditioner</span>
+                    <strong>{% if gaming_room.air_conditioner %}Available{% else %}Not Available{% endif %}</strong>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="room-games">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-header__subtitle">Game Library</span>
+                <h2 class="section-header__title">Available Games</h2>
+                <p class="section-header__description">Choose from the games available in this Gaming Room.</p>
+            </div>
+
+            <div class="games-grid">
+                {% for game in gaming_room.games.all %}
+                    <article class="game-card">
+                        <div class="game-card__image">
+                            {% if game.cover %}
+                                <img src="{{ game.cover.url }}" alt="{{ game.title }}">
+                            {% else %}
+                                <div class="image-placeholder">
+                                    <i class="fa-solid fa-gamepad"></i>
+                                    <span>{{ game.title }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="game-card__content">
+                            <span class="game-card__genre">{{ game.genre }}</span>
+                            <h3 class="game-card__title">{{ game.title }}</h3>
+
+                            {% if game.description %}
+                                <p class="game-card__description">{{ game.description|truncatewords:20 }}</p>
+                            {% endif %}
+
+                            <div class="game-card__meta">
+                                <span><i class="fa-solid fa-layer-group"></i> {{ game.platform }}</span>
+                                {% if game.multiplayer %}
+                                    <span><i class="fa-solid fa-users"></i> Multiplayer</span>
+                                {% endif %}
+                                {% if game.age_rating %}
+                                    <span><i class="fa-solid fa-shield"></i> {{ game.age_rating }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="catalog__empty">
+                        <div class="catalog__empty-icon"><i class="fa-solid fa-gamepad"></i></div>
+                        <h3>No Games Available</h3>
+                        <p>Games for this Gaming Room have not been added yet.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="room-reviews">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-header__content">
+                    <span class="section-header__subtitle">Player Feedback</span>
+                    <h2 class="section-header__title">Reviews</h2>
+                    <p class="section-header__description">See what players think about this Gaming Room.</p>
+                </div>
+
+                {% if user.is_authenticated %}
+                    <a class="button button--secondary" href="{% url 'main:review_create' gaming_room.slug %}">
+                        <i class="fa-regular fa-star"></i> Write A Review
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="reviews-grid">
+                {% for review in gaming_room.reviews.all %}
+                    <article class="review-card">
+                        <div class="review-card__header">
+                            <div class="review-card__author">
+                                {% if review.user.profile.avatar %}
+                                    <img src="{{ review.user.profile.avatar.url }}" alt="{{ review.user.username }}">
+                                {% else %}
+                                    <div class="review-card__avatar">
+                                        {{ review.user.username|first|upper }}
+                                    </div>
+                                {% endif %}
+
+                                <div>
+                                    <h3>{{ review.user.get_full_name|default:review.user.username }}</h3>
+                                    <span>{{ review.created_at|date:"d.m.Y" }}</span>
+                                </div>
+                            </div>
+
+                            <div class="review-card__rating">
+                                <i class="fa-solid fa-star"></i>
+                                <strong>{{ review.rating }}</strong>
+                            </div>
+                        </div>
+
+                        {% if review.comment %}
+                            <p class="review-card__comment">{{ review.comment }}</p>
+                        {% endif %}
+
+                        {% if user == review.user %}
+                            <div class="review-card__actions">
+                                <a href="{% url 'main:review_edit' review.id %}">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </a>
+                                <form method="post" action="{% url 'main:review_delete' review.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </article>
+                {% empty %}
+                    <div class="reviews-empty">
+                        <div class="reviews-empty__icon"><i class="fa-regular fa-comment"></i></div>
+                        <h3>No Reviews Yet</h3>
+                        <p>Be the first player to share your experience.</p>
+
+                        {% if user.is_authenticated %}
+                            <a class="button button--primary" href="{% url 'main:review_create' gaming_room.slug %}">
+                                Write The First Review
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="room-booking-cta">
+        <div class="container">
+            <div class="room-booking-cta__content">
+                <div>
+                    <span class="room-booking-cta__subtitle">Ready To Play?</span>
+                    <h2 class="room-booking-cta__title">Book {{ gaming_room.title }}</h2>
+                    <p class="room-booking-cta__description">
+                        Reserve your Gaming Room and create your next unforgettable session.
+                    </p>
+                </div>
+
+                <div class="room-booking-cta__action">
+                    <div class="room-booking-cta__price">
+                        <strong>{{ gaming_room.price_per_hour }}</strong>
+                        <span>/ hour</span>
+                    </div>
+
+                    {% if gaming_room.is_available %}
+                        {% if user.is_authenticated %}
+                            <a class="button button--primary" href="{% url 'main:booking_create' gaming_room.slug %}">
+                                Continue To Booking <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        {% else %}
+                            <a class="button button--primary" href="{% url 'main:login' %}?next={% url 'main:booking_create' gaming_room.slug %}">
+                                Login To Book <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <span class="button button--disabled">Currently Unavailable</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/catalog.js' %}" defer></script>
+{% endblock %}

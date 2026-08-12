@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Favorites | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="favorites-page">
+        <div class="container">
+            <div class="favorites-page__header">
+                <div>
+                    <span class="favorites-page__eyebrow">Your Collection</span>
+                    <h1 class="favorites-page__title">Favorite Gaming Rooms</h1>
+                    <p class="favorites-page__description">
+                        Your favorite Gaming Rooms, saved in one place.
+                    </p>
+                </div>
+
+                <a class="button button--secondary" href="{% url 'main:gaming_rooms' %}">
+                    <i class="fa-solid fa-gamepad"></i>
+                    Browse Gaming Rooms
+                </a>
+            </div>
+
+            {% if favorites %}
+                <div class="favorites-page__count">
+                    <span>
+                        <i class="fa-solid fa-heart"></i>
+                        {{ favorites|length }} Favorite{{ favorites|length|pluralize }}
+                    </span>
+                </div>
+
+                <div class="favorites-grid">
+                    {% for favorite in favorites %}
+                        <article class="favorite-card">
+                            <a class="favorite-card__image" href="{% url 'main:gaming_room_detail' favorite.gaming_room.slug %}">
+                                {% if favorite.gaming_room.image %}
+                                    <img src="{{ favorite.gaming_room.image.url }}" alt="{{ favorite.gaming_room.title }}">
+                                {% else %}
+                                    <div class="image-placeholder">
+                                        <i class="fa-solid fa-gamepad"></i>
+                                        <span>{{ favorite.gaming_room.title }}</span>
+                                    </div>
+                                {% endif %}
+
+                                <span class="favorite-card__badge">
+                                    <i class="fa-solid fa-heart"></i>
+                                </span>
+                            </a>
+
+                            <div class="favorite-card__content">
+                                <div class="favorite-card__category">
+                                    <span>{{ favorite.gaming_room.category.name }}</span>
+                                    {% if favorite.gaming_room.is_available %}
+                                        <span class="availability availability--available">Available</span>
+                                    {% else %}
+                                        <span class="availability availability--unavailable">Unavailable</span>
+                                    {% endif %}
+                                </div>
+
+                                <h2 class="favorite-card__title">
+                                    <a href="{% url 'main:gaming_room_detail' favorite.gaming_room.slug %}">
+                                        {{ favorite.gaming_room.title }}
+                                    </a>
+                                </h2>
+
+                                <p class="favorite-card__description">
+                                    {% if favorite.gaming_room.description %}
+                                        {{ favorite.gaming_room.description|truncatewords:20 }}
+                                    {% else %}
+                                        Premium gaming experience at PS Lounge.
+                                    {% endif %}
+                                </p>
+
+                                <div class="favorite-card__meta">
+                                    <div>
+                                        <i class="fa-solid fa-star"></i>
+                                        <strong>{{ favorite.gaming_room.rating }}</strong>
+                                        <span>rating</span>
+                                    </div>
+
+                                    <div>
+                                        <i class="fa-solid fa-users"></i>
+                                        <span>Up to {{ favorite.gaming_room.max_players }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="favorite-card__footer">
+                                    <div class="favorite-card__price">
+                                        <strong>{{ favorite.gaming_room.price_per_hour }}</strong>
+                                        <span>/ hour</span>
+                                    </div>
+
+                                    <div class="favorite-card__actions">
+                                        <a class="button button--secondary" href="{% url 'main:gaming_room_detail' favorite.gaming_room.slug %}">
+                                            View
+                                        </a>
+
+                                        <form method="post" action="{% url 'main:favorite_toggle' favorite.gaming_room.slug %}">
+                                            {% csrf_token %}
+                                            <button
+                                                class="button button--danger"
+                                                type="submit"
+                                                aria-label="Remove {{ favorite.gaming_room.title }} from favorites"
+                                            >
+                                                <i class="fa-solid fa-heart-crack"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="favorites-empty">
+                    <div class="favorites-empty__icon">
+                        <i class="fa-regular fa-heart"></i>
+                    </div>
+
+                    <span class="favorites-empty__eyebrow">Your Favorites</span>
+                    <h2>Nothing Saved Yet</h2>
+                    <p>
+                        You haven't added any Gaming Rooms to your favorites.
+                        Explore the catalog and save the rooms you like.
+                    </p>
+
+                    <a class="button button--primary" href="{% url 'main:gaming_rooms' %}">
+                        <i class="fa-solid fa-gamepad"></i>
+                        Explore Gaming Rooms
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <script src="{% static 'js/favorites.js' %}"></script>
+{% endblock %}

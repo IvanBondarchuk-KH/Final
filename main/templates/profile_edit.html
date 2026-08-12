@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Edit Profile | PS Lounge
+{% endblock %}
+
+{% block content %}
+
+<section
+    class="profile-edit-page"
+    data-profile-page
+>
+
+    <div class="container">
+
+        <header class="profile-edit-page__header">
+
+            <div>
+                <span class="profile-edit-page__eyebrow">
+                    Account Settings
+                </span>
+
+                <h1 class="profile-edit-page__title">
+                    Edit Profile
+                </h1>
+
+                <p class="profile-edit-page__description">
+                    Update your PS Lounge profile information and personal preferences.
+                </p>
+            </div>
+
+            <a
+                class="button button--secondary"
+                href="{% url 'main:profile' %}"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Back To Profile
+            </a>
+
+        </header>
+
+
+        <div class="profile-edit-page__grid">
+
+            <aside class="profile-edit-sidebar">
+
+                <div class="profile-edit-sidebar__avatar">
+
+                    {% if profile.avatar %}
+
+                        <img
+                            src="{{ profile.avatar.url }}"
+                            alt="{{ request.user.username }}"
+                            data-avatar-preview
+                        >
+
+                    {% else %}
+
+                        <span data-avatar-preview>
+                            {{ request.user.username|first|upper }}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <span class="profile-edit-page__eyebrow">
+                    Your Account
+                </span>
+
+                <h2>
+                    {{ request.user.username }}
+                </h2>
+
+                <p>
+                    Keep your profile information up to date.
+                </p>
+
+
+                <nav class="profile-edit-sidebar__links">
+
+                    <a href="{% url 'main:profile' %}">
+                        <span>
+                            <i class="fa-regular fa-user"></i>
+                            Profile
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    <a href="{% url 'main:change_password' %}">
+                        <span>
+                            <i class="fa-solid fa-shield-halved"></i>
+                            Change Password
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    <a href="{% url 'main:favorites' %}">
+                        <span>
+                            <i class="fa-regular fa-heart"></i>
+                            Favorites
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                </nav>
+
+            </aside>
+
+
+            <main class="profile-edit-form-card">
+
+                {% if user_form.non_field_errors or profile_form.non_field_errors %}
+
+                    <div class="form-errors">
+
+                        <div class="form-errors__icon">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+
+                        <div>
+
+                            {% for error in user_form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+
+                            {% for error in profile_form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                    data-profile-form
+                >
+
+                    {% csrf_token %}
+
+
+                    <section class="profile-edit-form-section">
+
+                        <div class="profile-edit-form-section__header">
+
+                            <div>
+
+                                <span>
+                                    Personal Information
+                                </span>
+
+                                <h2>
+                                    Account Details
+                                </h2>
+
+                            </div>
+
+                            <i class="fa-regular fa-user"></i>
+
+                        </div>
+
+
+                        <div class="profile-form-grid">
+
+                            <div class="form-field">
+
+                                <label
+                                    class="form-field__label"
+                                    for="{{ user_form.first_name.id_for_label }}"
+                                >
+                                    First Name
+                                </label>
+
+                                <div class="form-field__input-wrapper">
+
+                                    <i class="fa-regular fa-user"></i>
+
+                                    {{ user_form.first_name }}
+
+                                </div>
+
+                                {% if user_form.first_name.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in user_form.first_name.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label
+                                    class="form-field__label"
+                                    for="{{ user_form.last_name.id_for_label }}"
+                                >
+                                    Last Name
+                                </label>
+
+                                <div class="form-field__input-wrapper">
+
+                                    <i class="fa-regular fa-user"></i>
+
+                                    {{ user_form.last_name }}
+
+                                </div>
+
+                                {% if user_form.last_name.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in user_form.last_name.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="form-field profile-form-field--full">
+
+                                <label
+                                    class="form-field__label"
+                                    for="{{ user_form.email.id_for_label }}"
+                                >
+                                    Email Address
+                                </label>
+
+                                <div class="form-field__input-wrapper">
+
+                                    <i class="fa-regular fa-envelope"></i>
+
+                                    {{ user_form.email }}
+
+                                </div>
+
+                                {% if user_form.email.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in user_form.email.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <section class="profile-edit-form-section">
+
+                        <div class="profile-edit-form-section__header">
+
+                            <div>
+
+                                <span>
+                                    Profile
+                                </span>
+
+                                <h2>
+                                    Personal Preferences
+                                </h2>
+
+                            </div>
+
+                            <i class="fa-solid fa-sliders"></i>
+
+                        </div>
+
+
+                        <div class="profile-form-grid">
+
+                            <div class="form-field profile-form-field--full">
+
+                                <label
+                                    class="form-field__label"
+                                    for="{{ profile_form.avatar.id_for_label }}"
+                                >
+                                    Avatar
+                                </label>
+
+                                <div class="form-field__input-wrapper">
+
+                                    <i class="fa-regular fa-image"></i>
+
+                                    {{ profile_form.avatar }}
+
+                                </div>
+
+                                <div class="form-field__help">
+                                    JPG, PNG or WEBP. Maximum recommended size: 5 MB.
+                                </div>
+
+                                {% if profile_form.avatar.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in profile_form.avatar.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label
+                                    class="form-field__label"
+                                    for="{{ profile_form.phone.id_for_label }}"
+                                >
+                                    Phone
+                                </label>
+
+                                <div class="form-field__input-wrapper">
+
+                                    <i class="fa-solid fa-phone"></i>
+
+                                    {{ profile_form.phone }}
+
+                                </div>
+
+                                {% if profile_form.phone.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in profile_form.phone.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label
+                                    class="form-field__label"
+                                    for="{{ profile_form.date_of_birth.id_for_label }}"
+                                >
+                                    Date Of Birth
+                                </label>
+
+                                <div class="form-field__input-wrapper">
+
+                                    <i class="fa-regular fa-calendar"></i>
+
+                                    {{ profile_form.date_of_birth }}
+
+                                </div>
+
+                                {% if profile_form.date_of_birth.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in profile_form.date_of_birth.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label
+                                    class="form-field__label"
+                                    for="{{ profile_form.city.id_for_label }}"
+                                >
+                                    City
+                                </label>
+
+                                <div class="form-field__input-wrapper">
+
+                                    <i class="fa-solid fa-location-dot"></i>
+
+                                    {{ profile_form.city }}
+
+                                </div>
+
+                                {% if profile_form.city.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in profile_form.city.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="form-field">
+
+                                <label
+                                    class="form-field__label"
+                                    for="{{ profile_form.favorite_game.id_for_label }}"
+                                >
+                                    Favorite Game
+                                </label>
+
+                                <div class="form-field__input-wrapper">
+
+                                    <i class="fa-solid fa-gamepad"></i>
+
+                                    {{ profile_form.favorite_game }}
+
+                                </div>
+
+                                {% if profile_form.favorite_game.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in profile_form.favorite_game.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="form-field profile-form-field--full">
+
+                                <div class="form-field__label-row">
+
+                                    <label
+                                        class="form-field__label"
+                                        for="{{ profile_form.bio.id_for_label }}"
+                                    >
+                                        Bio
+                                    </label>
+
+                                    <span
+                                        class="form-field__help"
+                                        data-bio-counter
+                                    >
+                                        0
+                                    </span>
+
+                                </div>
+
+                                {{ profile_form.bio }}
+
+                                {% if profile_form.bio.errors %}
+
+                                    <div class="form-field__errors">
+
+                                        {% for error in profile_form.bio.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <div class="profile-edit-form__footer">
+
+                        <a
+                            class="button button--secondary"
+                            href="{% url 'main:profile' %}"
+                        >
+                            Cancel
+                        </a>
+
+                        <button
+                            class="button button--primary"
+                            type="submit"
+                        >
+                            <i class="fa-solid fa-check"></i>
+                            Save Changes
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </main>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<script src="{% static 'js/profile.js' %}"></script>
+
+{% endblock %}

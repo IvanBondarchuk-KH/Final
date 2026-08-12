@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Create Account | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="auth-page">
+        <div class="container">
+            <div class="auth-page__grid">
+                <div class="auth-page__visual">
+                    <div class="auth-page__visual-content">
+                        <span class="auth-page__eyebrow">PS Lounge</span>
+
+                        <h1 class="auth-page__visual-title">
+                            Enter The<br>
+                            <span>Experience.</span>
+                        </h1>
+
+                        <p class="auth-page__visual-description">
+                            Create your account and unlock premium Gaming Rooms, bookings, games and more.
+                        </p>
+
+                        <div class="auth-page__visual-features">
+                            <div class="auth-page__visual-feature">
+                                <i class="fa-solid fa-calendar-check"></i>
+                                <span>Book Premium Gaming Rooms</span>
+                            </div>
+
+                            <div class="auth-page__visual-feature">
+                                <i class="fa-solid fa-heart"></i>
+                                <span>Save Your Favorite Rooms</span>
+                            </div>
+
+                            <div class="auth-page__visual-feature">
+                                <i class="fa-solid fa-trophy"></i>
+                                <span>Compete On The Leaderboard</span>
+                            </div>
+
+                            <div class="auth-page__visual-feature">
+                                <i class="fa-solid fa-comments"></i>
+                                <span>Connect With The Community</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="auth-page__visual-mark">
+                        <i class="fa-brands fa-playstation"></i>
+                    </div>
+                </div>
+
+                <div class="auth-page__form-wrapper">
+                    <div class="auth-form">
+                        <div class="auth-form__header">
+                            <span class="auth-form__subtitle">Create Your Account</span>
+                            <h2 class="auth-form__title">Join PS Lounge</h2>
+                            <p class="auth-form__description">
+                                Fill in your details to get started.
+                            </p>
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="form-errors">
+                                <div class="form-errors__icon">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                </div>
+                                <div>
+                                    {% for error in form.non_field_errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <form class="auth-form__form" method="post">
+                            {% csrf_token %}
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.username.id_for_label }}">
+                                    Username
+                                </label>
+                                <div class="form-field__input-wrapper">
+                                    <i class="fa-regular fa-user"></i>
+                                    {{ form.username }}
+                                </div>
+
+                                {% if form.username.help_text %}
+                                    <div class="form-field__help">
+                                        {{ form.username.help_text|safe }}
+                                    </div>
+                                {% endif %}
+
+                                {% if form.username.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.username.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.email.id_for_label }}">
+                                    Email
+                                </label>
+                                <div class="form-field__input-wrapper">
+                                    <i class="fa-regular fa-envelope"></i>
+                                    {{ form.email }}
+                                </div>
+
+                                {% if form.email.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.email.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.password1.id_for_label }}">
+                                    Password
+                                </label>
+                                <div class="form-field__input-wrapper">
+                                    <i class="fa-solid fa-lock"></i>
+                                    {{ form.password1 }}
+                                </div>
+
+                                {% if form.password1.help_text %}
+                                    <div class="form-field__help">
+                                        {{ form.password1.help_text|safe }}
+                                    </div>
+                                {% endif %}
+
+                                {% if form.password1.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.password1.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.password2.id_for_label }}">
+                                    Confirm Password
+                                </label>
+                                <div class="form-field__input-wrapper">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    {{ form.password2 }}
+                                </div>
+
+                                {% if form.password2.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.password2.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <button class="button button--primary button--full" type="submit">
+                                Create Account
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </form>
+
+                        <div class="auth-form__divider">
+                            <span>Already have an account?</span>
+                        </div>
+
+                        <a class="button button--secondary button--full" href="{% url 'main:login' %}">
+                            Sign In
+                        </a>
+
+                        <div class="auth-form__back">
+                            <a href="{% url 'main:home' %}">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                Back to PS Lounge
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

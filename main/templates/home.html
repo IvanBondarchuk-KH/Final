@@ -1,0 +1,893 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    PS Lounge | Premium Gaming Experience
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================
+     PREMIUM HOME HERO
+     ========================================================= -->
+
+<section class="home-hero">
+
+    <div class="home-hero__ambient" aria-hidden="true">
+        <div class="home-hero__orb home-hero__orb--one"></div>
+        <div class="home-hero__orb home-hero__orb--two"></div>
+        <div class="home-hero__orb home-hero__orb--three"></div>
+        <div class="home-hero__rings"></div>
+    </div>
+
+    <div class="container">
+
+        <div class="home-hero__layout">
+
+            <div class="home-hero__content">
+
+                <div class="home-hero__eyebrow">
+                    <span class="home-hero__eyebrow-dot"></span>
+
+                    <i class="fa-brands fa-playstation"></i>
+
+                    Premium PlayStation Experience
+                </div>
+
+                <h1 class="home-hero__title">
+
+                    Your Game.
+                    <br>
+
+                    Your Room.
+                    <br>
+
+                    <span>Your Moment.</span>
+
+                </h1>
+
+                <p class="home-hero__description">
+                    A premium gaming environment engineered around
+                    the player — from next-generation hardware and
+                    4K HDR displays to high-speed connectivity and
+                    immersive gaming sessions.
+                </p>
+
+                <div class="home-hero__actions">
+
+                    <a
+                        class="button button--primary home-hero__primary"
+                        href="{% url 'main:gaming_rooms' %}"
+                    >
+
+                        <span>
+                            Explore Gaming Rooms
+                        </span>
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                    {% if not user.is_authenticated %}
+
+                        <a
+                            class="button button--secondary"
+                            href="{% url 'main:register' %}"
+                        >
+
+                            Create Account
+
+                        </a>
+
+                    {% else %}
+
+                        <a
+                            class="button button--secondary"
+                            href="{% url 'main:profile' %}"
+                        >
+
+                            <i class="fa-regular fa-user"></i>
+
+                            My Profile
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="home-hero__stats">
+
+                    <div class="home-hero__stat">
+
+                        <span class="home-hero__stat-icon">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </span>
+
+                        <div>
+                            <strong>PS5 Pro</strong>
+                            <span>Next-generation hardware</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="home-hero__stat">
+
+                        <span class="home-hero__stat-icon">
+                            <i class="fa-solid fa-display"></i>
+                        </span>
+
+                        <div>
+                            <strong>4K HDR</strong>
+                            <span>Cinematic visual quality</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="home-hero__stat">
+
+                        <span class="home-hero__stat-icon">
+                            <i class="fa-solid fa-wifi"></i>
+                        </span>
+
+                        <div>
+                            <strong>1 Gbps</strong>
+                            <span>High-speed connectivity</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="home-hero__visual">
+
+                <div class="home-hero__visual-glow"></div>
+
+                <div class="home-hero__console-card">
+
+                    <div class="home-hero__console-top">
+
+                        <span>
+                            PS LOUNGE
+                        </span>
+
+                        <span>
+                            <i class="fa-brands fa-playstation"></i>
+                        </span>
+
+                    </div>
+
+
+                    <div class="home-hero__console-center">
+
+                        <div class="home-hero__console-ring">
+
+                            <div class="home-hero__console-icon">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+
+                        </div>
+
+                        <span class="home-hero__console-label">
+                            ROOM 01
+                        </span>
+
+                        <strong>
+                            READY TO PLAY
+                        </strong>
+
+                    </div>
+
+
+                    <div class="home-hero__console-bottom">
+
+                        <span>
+                            PS5 PRO
+                        </span>
+
+                        <span>
+                            4K / HDR
+                        </span>
+
+                        <span>
+                            1 Gbps
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="home-hero__floating home-hero__floating--top">
+
+                    <span class="home-hero__floating-icon">
+                        <i class="fa-solid fa-bolt"></i>
+                    </span>
+
+                    <span>
+                        Ultra Performance
+                    </span>
+
+                </div>
+
+
+                <div class="home-hero__floating home-hero__floating--bottom">
+
+                    <span class="home-hero__floating-live"></span>
+
+                    Lounge Online
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     EXPERIENCE
+     ========================================================= -->
+
+<section class="home-experience">
+
+    <div class="container">
+
+        <div class="home-section-heading home-section-heading--center">
+
+            <span class="home-section-heading__eyebrow">
+                The PS Lounge Difference
+            </span>
+
+            <h2 class="home-section-heading__title">
+                Gaming Without Compromise.
+            </h2>
+
+            <p class="home-section-heading__description">
+                Every part of the environment is designed to remove
+                distractions and put the game first.
+            </p>
+
+        </div>
+
+
+        <div class="home-experience__grid">
+
+            <article class="home-experience-card">
+
+                <div class="home-experience-card__number">
+                    01
+                </div>
+
+                <div class="home-experience-card__icon">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+
+                <h3>
+                    PlayStation 5 Pro
+                </h3>
+
+                <p>
+                    Powerful next-generation hardware built for
+                    demanding games, competitive sessions and
+                    premium visual performance.
+                </p>
+
+                <span class="home-experience-card__accent"></span>
+
+            </article>
+
+
+            <article class="home-experience-card">
+
+                <div class="home-experience-card__number">
+                    02
+                </div>
+
+                <div class="home-experience-card__icon">
+                    <i class="fa-solid fa-display"></i>
+                </div>
+
+                <h3>
+                    4K HDR Displays
+                </h3>
+
+                <p>
+                    High-detail visuals, strong contrast and
+                    immersive large-format displays for a
+                    more cinematic gaming experience.
+                </p>
+
+                <span class="home-experience-card__accent"></span>
+
+            </article>
+
+
+            <article class="home-experience-card">
+
+                <div class="home-experience-card__number">
+                    03
+                </div>
+
+                <div class="home-experience-card__icon">
+                    <i class="fa-solid fa-wifi"></i>
+                </div>
+
+                <h3>
+                    Ultra-Fast Internet
+                </h3>
+
+                <p>
+                    Fast, stable connectivity for online
+                    multiplayer, downloads and uninterrupted
+                    competitive play.
+                </p>
+
+                <span class="home-experience-card__accent"></span>
+
+            </article>
+
+
+            <article class="home-experience-card">
+
+                <div class="home-experience-card__number">
+                    04
+                </div>
+
+                <div class="home-experience-card__icon">
+                    <i class="fa-solid fa-vr-cardboard"></i>
+                </div>
+
+                <h3>
+                    VR Experience
+                </h3>
+
+                <p>
+                    Selected rooms provide immersive VR-ready
+                    setups for experiences that go beyond the
+                    traditional screen.
+                </p>
+
+                <span class="home-experience-card__accent"></span>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     POPULAR ROOMS
+     ========================================================= -->
+
+<section class="home-rooms">
+
+    <div class="container">
+
+        <div class="home-section-heading home-section-heading--split">
+
+            <div>
+
+                <span class="home-section-heading__eyebrow">
+                    Curated Selection
+                </span>
+
+                <h2 class="home-section-heading__title">
+                    Popular Gaming Rooms.
+                </h2>
+
+                <p class="home-section-heading__description">
+                    Premium setups selected for the ultimate
+                    gaming session.
+                </p>
+
+            </div>
+
+
+            <a
+                class="button button--secondary"
+                href="{% url 'main:gaming_rooms' %}"
+            >
+
+                View All Rooms
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="home-rooms__grid">
+
+            {% for room in popular_rooms %}
+
+                <article class="home-room-card">
+
+                    <a
+                        class="home-room-card__media"
+                        href="{% url 'main:gaming_room_detail' room.slug %}"
+                    >
+
+                        {% if room.image %}
+
+                            <img
+                                src="{{ room.image.url }}"
+                                alt="{{ room.title }}"
+                            >
+
+                        {% else %}
+
+                            <div class="image-placeholder">
+
+                                <i class="fa-solid fa-gamepad"></i>
+
+                                <span>
+                                    {{ room.title }}
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <div class="home-room-card__overlay"></div>
+
+
+                        <span class="home-room-card__category">
+                            {{ room.category.name }}
+                        </span>
+
+
+                        {% if room.is_available %}
+
+                            <span class="home-room-card__status home-room-card__status--available">
+
+                                <span></span>
+
+                                Available
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="home-room-card__status home-room-card__status--unavailable">
+
+                                <span></span>
+
+                                Unavailable
+
+                            </span>
+
+                        {% endif %}
+
+                    </a>
+
+
+                    <div class="home-room-card__content">
+
+                        <div class="home-room-card__top">
+
+                            <div>
+
+                                <span class="home-room-card__room-number">
+                                    ROOM {{ room.room_number|stringformat:"02d" }}
+                                </span>
+
+                                <h3 class="home-room-card__title">
+                                    {{ room.title }}
+                                </h3>
+
+                            </div>
+
+
+                            <div class="home-room-card__rating">
+
+                                <i class="fa-solid fa-star"></i>
+
+                                <strong>
+                                    {{ room.rating }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <p class="home-room-card__description">
+                            {{ room.description|truncatewords:18 }}
+                        </p>
+
+
+                        <div class="home-room-card__features">
+
+                            <span>
+                                <i class="fa-solid fa-users"></i>
+                                {{ room.max_players }} Players
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-tv"></i>
+                                {{ room.tv_size }}"
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-gamepad"></i>
+                                {{ room.controllers }}
+                            </span>
+
+                            {% if room.vr_available %}
+
+                                <span>
+                                    <i class="fa-solid fa-vr-cardboard"></i>
+                                    VR
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="home-room-card__footer">
+
+                            <div class="home-room-card__price">
+
+                                <span>
+                                    Starting from
+                                </span>
+
+                                <strong>
+                                    {{ room.price_per_hour }}
+                                </strong>
+
+                                <small>
+                                    / hour
+                                </small>
+
+                            </div>
+
+
+                            <a
+                                class="button button--small button--primary"
+                                href="{% url 'main:gaming_room_detail' room.slug %}"
+                            >
+
+                                View Room
+
+                                <i class="fa-solid fa-arrow-right"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% empty %}
+
+                <div class="catalog__empty">
+
+                    <div class="catalog__empty-icon">
+
+                        <i class="fa-solid fa-gamepad"></i>
+
+                    </div>
+
+                    <h3>
+                        No Gaming Rooms Yet
+                    </h3>
+
+                    <p>
+                        Our premium Gaming Rooms will appear here
+                        once they are added.
+                    </p>
+
+                    {% if user.is_staff %}
+
+                        <a
+                            class="button button--primary"
+                            href="{% url 'admin:index' %}"
+                        >
+                            Open Admin Panel
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     EXPERIENCE SHOWCASE
+     ========================================================= -->
+
+<section class="home-showcase">
+
+    <div class="container">
+
+        <div class="home-showcase__layout">
+
+
+            <div class="home-showcase__content">
+
+                <span class="home-showcase__eyebrow">
+                    Built For Players
+                </span>
+
+                <h2 class="home-showcase__title">
+                    More Than.
+                    <br>
+                    Just A Gaming Room.
+                </h2>
+
+                <p class="home-showcase__description">
+                    Whether you are competing with friends,
+                    exploring a new world or chasing your next
+                    high score, PS Lounge gives every session
+                    the environment it deserves.
+                </p>
+
+
+                <div class="home-showcase__features">
+
+                    <div class="home-showcase__feature">
+
+                        <span class="home-showcase__feature-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </span>
+
+                        <div>
+                            <strong>
+                                Easy Booking
+                            </strong>
+
+                            <span>
+                                Choose your room, game, date and time.
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="home-showcase__feature">
+
+                        <span class="home-showcase__feature-icon">
+                            <i class="fa-regular fa-credit-card"></i>
+                        </span>
+
+                        <div>
+                            <strong>
+                                Simple Payment
+                            </strong>
+
+                            <span>
+                                Complete your reservation with a seamless payment simulation.
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="home-showcase__feature">
+
+                        <span class="home-showcase__feature-icon">
+                            <i class="fa-regular fa-comments"></i>
+                        </span>
+
+                        <div>
+                            <strong>
+                                Stay Connected
+                            </strong>
+
+                            <span>
+                                Chat with players and connect with the community.
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    class="button button--primary"
+                    href="{% url 'main:gaming_rooms' %}"
+                >
+
+                    Find Your Room
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="home-showcase__visual">
+
+                <div class="home-showcase__halo"></div>
+
+
+                <div class="home-showcase__device">
+
+                    <div class="home-showcase__device-top">
+
+                        <span>
+                            PS LOUNGE
+                        </span>
+
+                        <i class="fa-brands fa-playstation"></i>
+
+                    </div>
+
+
+                    <div class="home-showcase__device-center">
+
+                        <div class="home-showcase__device-orbit">
+
+                            <div class="home-showcase__device-icon">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+
+                        </div>
+
+                        <span>
+                            NEXT SESSION
+                        </span>
+
+                        <strong>
+                            READY
+                        </strong>
+
+                    </div>
+
+
+                    <div class="home-showcase__device-bottom">
+
+                        <span>PS5 PRO</span>
+                        <span>4K / HDR</span>
+                        <span>1 Gbps</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     COMMUNITY
+     ========================================================= -->
+
+<section class="home-community">
+
+    <div class="home-community__ambient"></div>
+
+    <div class="container">
+
+        <div class="home-community__content">
+
+            <span class="home-community__eyebrow">
+                PS Lounge Community
+            </span>
+
+            <h2 class="home-community__title">
+                Play.
+                Compete.
+                Connect.
+            </h2>
+
+            <p class="home-community__description">
+                Create your account and unlock the full
+                PS Lounge experience — from bookings and
+                favorites to games, scores, chats and the
+                global leaderboard.
+            </p>
+
+
+            {% if user.is_authenticated %}
+
+                <div class="home-community__actions">
+
+                    <a
+                        class="button button--primary"
+                        href="{% url 'main:game' %}"
+                    >
+
+                        <i class="fa-solid fa-bolt"></i>
+
+                        Play The Game
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+
+                    <a
+                        class="button button--secondary"
+                        href="{% url 'main:leaderboard' %}"
+                    >
+
+                        <i class="fa-solid fa-trophy"></i>
+
+                        View Leaderboard
+
+                    </a>
+
+                </div>
+
+            {% else %}
+
+                <div class="home-community__actions">
+
+                    <a
+                        class="button button--primary"
+                        href="{% url 'main:register' %}"
+                    >
+
+                        <i class="fa-solid fa-user-plus"></i>
+
+                        Join PS Lounge
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+
+                    <a
+                        class="button button--secondary"
+                        href="{% url 'main:login' %}"
+                    >
+
+                        Login
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="home-community__signature">
+
+                <span></span>
+
+                <i class="fa-brands fa-playstation"></i>
+
+                <span></span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

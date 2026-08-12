@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Payment | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="payment-page">
+        <div class="container">
+            <div class="payment-page__header">
+                <div>
+                    <span class="payment-page__eyebrow">Secure Checkout</span>
+                    <h1 class="payment-page__title">Complete Your Payment</h1>
+                    <p class="payment-page__description">
+                        Confirm your booking and complete the simulated payment.
+                    </p>
+                </div>
+
+                <a class="button button--secondary" href="{% url 'main:booking_detail' booking.id %}">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back To Booking
+                </a>
+            </div>
+
+            <div class="payment-page__grid">
+                <main class="payment-card">
+                    <div class="payment-card__header">
+                        <div class="payment-card__icon">
+                            <i class="fa-regular fa-credit-card"></i>
+                        </div>
+                        <div>
+                            <span class="payment-card__subtitle">Payment Details</span>
+                            <h2 class="payment-card__title">Simulated Payment</h2>
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="form-errors">
+                            <div class="form-errors__icon">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                            </div>
+                            <div>
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="payment-notice">
+                        <div class="payment-notice__icon">
+                            <i class="fa-solid fa-flask"></i>
+                        </div>
+                        <div>
+                            <strong>Payment Simulation</strong>
+                            <p>
+                                This is a demonstration payment. No real money or banking information is processed.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form class="payment-form" method="post">
+                        {% csrf_token %}
+
+                        {% if form.payment_method %}
+                            <div class="payment-form__section">
+                                <div class="payment-form__section-header">
+                                    <span>Payment Method</span>
+                                    <i class="fa-solid fa-wallet"></i>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-field__label" for="{{ form.payment_method.id_for_label }}">
+                                        Select Payment Method
+                                    </label>
+                                    <div class="form-field__input-wrapper">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                        {{ form.payment_method }}
+                                    </div>
+
+                                    {% if form.payment_method.errors %}
+                                        <div class="form-field__errors">
+                                            {% for error in form.payment_method.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if form.transaction_id %}
+                            <div class="payment-form__section">
+                                <div class="payment-form__section-header">
+                                    <span>Transaction</span>
+                                    <i class="fa-solid fa-receipt"></i>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-field__label" for="{{ form.transaction_id.id_for_label }}">
+                                        Transaction ID
+                                    </label>
+                                    <div class="form-field__input-wrapper">
+                                        <i class="fa-solid fa-hashtag"></i>
+                                        {{ form.transaction_id }}
+                                    </div>
+
+                                    {% if form.transaction_id.errors %}
+                                        <div class="form-field__errors">
+                                            {% for error in form.transaction_id.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if not form.payment_method and not form.transaction_id %}
+                            <div class="payment-confirmation">
+                                <div class="payment-confirmation__icon">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <h3>Ready To Pay</h3>
+                                <p>
+                                    Press the button below to complete the simulated payment.
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <div class="payment-form__actions">
+                            <a class="button button--secondary" href="{% url 'main:booking_detail' booking.id %}">
+                                Cancel
+                            </a>
+                            <button class="button button--primary" type="submit">
+                                <i class="fa-solid fa-lock"></i>
+                                Pay {{ booking.total_price }}
+                            </button>
+                        </div>
+                    </form>
+                </main>
+
+                <aside class="payment-summary">
+                    <div class="payment-summary__header">
+                        <span>Order Summary</span>
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+
+                    <div class="payment-summary__room">
+                        <div class="payment-summary__image">
+                            {% if booking.gaming_room.image %}
+                                <img src="{{ booking.gaming_room.image.url }}" alt="{{ booking.gaming_room.title }}">
+                            {% else %}
+                                <div class="image-placeholder">
+                                    <i class="fa-solid fa-gamepad"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <span>Gaming Room</span>
+                            <h2>{{ booking.gaming_room.title }}</h2>
+                        </div>
+                    </div>
+
+                    <div class="payment-summary__divider"></div>
+
+                    <div class="payment-summary__details">
+                        <div>
+                            <span>Booking</span>
+                            <strong>#{{ booking.id }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Date</span>
+                            <strong>{{ booking.booking_date|date:"d.m.Y" }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Time</span>
+                            <strong>
+                                {{ booking.start_time|time:"H:i" }} — {{ booking.end_time|time:"H:i" }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Duration</span>
+                            <strong>
+                                {{ booking.hours }} hour{{ booking.hours|pluralize }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Game</span>
+                            <strong>{{ booking.selected_game.title }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="payment-summary__divider"></div>
+
+                    <div class="payment-summary__price">
+                        <span>Total Amount</span>
+                        <strong>{{ booking.total_price }}</strong>
+                    </div>
+
+                    <div class="payment-summary__security">
+                        <div>
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <p>
+                            Your payment is simulated securely. No real financial information is required.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/payment.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Payment #{{ payment.id }} | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="payment-detail-page">
+        <div class="container">
+            <div class="payment-detail-page__header">
+                <div>
+                    <span class="payment-detail-page__eyebrow">Payment</span>
+                    <h1 class="payment-detail-page__title">Payment Details</h1>
+                    <p class="payment-detail-page__description">
+                        View the payment information associated with your booking.
+                    </p>
+                </div>
+
+                <a class="button button--secondary" href="{% url 'main:booking_detail' payment.booking.id %}">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back To Booking
+                </a>
+            </div>
+
+            <div class="payment-detail-page__grid">
+                <main class="payment-detail-card">
+                    <div class="payment-detail-card__status">
+                        {% if payment.payment_status == "paid" %}
+                            <div class="payment-result-icon payment-result-icon--success">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span class="payment-result__label">Payment Successful</span>
+                            <h2>Your payment has been completed.</h2>
+                            <p>Your Gaming Room booking is confirmed.</p>
+
+                        {% elif payment.payment_status == "failed" %}
+                            <div class="payment-result-icon payment-result-icon--failed">
+                                <i class="fa-solid fa-xmark"></i>
+                            </div>
+                            <span class="payment-result__label">Payment Failed</span>
+                            <h2>Payment could not be completed.</h2>
+                            <p>Please return to your booking and try again.</p>
+
+                        {% else %}
+                            <div class="payment-result-icon payment-result-icon--waiting">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+                            <span class="payment-result__label">Payment Pending</span>
+                            <h2>Payment is waiting for completion.</h2>
+                            <p>The payment has not been completed yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="payment-detail-card__divider"></div>
+
+                    <div class="payment-detail-card__section">
+                        <div class="payment-detail-card__section-header">
+                            <span>Transaction Information</span>
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+
+                        <div class="payment-info-grid">
+                            <div class="payment-info">
+                                <span>Payment ID</span>
+                                <strong>#{{ payment.id }}</strong>
+                            </div>
+
+                            <div class="payment-info">
+                                <span>Booking ID</span>
+                                <strong>#{{ payment.booking.id }}</strong>
+                            </div>
+
+                            <div class="payment-info">
+                                <span>Transaction ID</span>
+                                <strong>{{ payment.transaction_id }}</strong>
+                            </div>
+
+                            <div class="payment-info">
+                                <span>Payment Method</span>
+                                <strong>{{ payment.payment_method }}</strong>
+                            </div>
+
+                            <div class="payment-info">
+                                <span>Payment Status</span>
+                                <strong class="payment-status payment-status--{{ payment.payment_status }}">
+                                    {% if payment.payment_status == "paid" %}
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    {% elif payment.payment_status == "failed" %}
+                                        <i class="fa-solid fa-circle-xmark"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-clock"></i>
+                                    {% endif %}
+                                    {{ payment.get_payment_status_display }}
+                                </strong>
+                            </div>
+
+                            <div class="payment-info">
+                                <span>Paid At</span>
+                                <strong>
+                                    {% if payment.paid_at %}
+                                        {{ payment.paid_at|date:"d.m.Y H:i" }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="payment-detail-card__section">
+                        <div class="payment-detail-card__section-header">
+                            <span>Booking</span>
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+
+                        <div class="payment-booking">
+                            <div class="payment-booking__image">
+                                {% if payment.booking.gaming_room.image %}
+                                    <img src="{{ payment.booking.gaming_room.image.url }}" alt="{{ payment.booking.gaming_room.title }}">
+                                {% else %}
+                                    <div class="image-placeholder">
+                                        <i class="fa-solid fa-gamepad"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="payment-booking__content">
+                                <span>Gaming Room</span>
+                                <h3>{{ payment.booking.gaming_room.title }}</h3>
+                                <p>
+                                    {{ payment.booking.booking_date|date:"d.m.Y" }}
+                                    ·
+                                    {{ payment.booking.start_time|time:"H:i" }}
+                                    —
+                                    {{ payment.booking.end_time|time:"H:i" }}
+                                </p>
+                                <span>Game: {{ payment.booking.selected_game.title }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="payment-detail-card__actions">
+                        <a class="button button--secondary" href="{% url 'main:booking_detail' payment.booking.id %}">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            View Booking
+                        </a>
+
+                        <a class="button button--primary" href="{% url 'main:profile' %}">
+                            <i class="fa-regular fa-user"></i>
+                            My Profile
+                        </a>
+                    </div>
+                </main>
+
+                <aside class="payment-detail-summary">
+                    <div class="payment-detail-summary__header">
+                        <span>Payment Summary</span>
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+
+                    <div class="payment-detail-summary__amount">
+                        <span>Total Paid</span>
+                        <strong>{{ payment.amount }}</strong>
+
+                        {% if payment.payment_status == "paid" %}
+                            <small>Payment completed successfully</small>
+                        {% elif payment.payment_status == "failed" %}
+                            <small>Payment was not completed</small>
+                        {% else %}
+                            <small>Payment is awaiting completion</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="payment-detail-summary__divider"></div>
+
+                    <div class="payment-detail-summary__rows">
+                        <div>
+                            <span>Room</span>
+                            <strong>{{ payment.booking.gaming_room.title }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Duration</span>
+                            <strong>
+                                {{ payment.booking.hours }} hour{{ payment.booking.hours|pluralize }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Date</span>
+                            <strong>{{ payment.booking.booking_date|date:"d.m.Y" }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Game</span>
+                            <strong>{{ payment.booking.selected_game.title }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="payment-detail-summary__divider"></div>
+
+                    <div class="payment-detail-summary__status">
+                        <div class="payment-detail-summary__status-icon">
+                            {% if payment.payment_status == "paid" %}
+                                <i class="fa-solid fa-shield-check"></i>
+                            {% elif payment.payment_status == "failed" %}
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            {% else %}
+                                <i class="fa-solid fa-clock"></i>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <strong>{{ payment.get_payment_status_display }}</strong>
+                            <p>
+                                {% if payment.payment_status == "paid" %}
+                                    Your simulated payment has been recorded.
+                                {% elif payment.payment_status == "failed" %}
+                                    The payment was unsuccessful.
+                                {% else %}
+                                    The payment is currently waiting.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="payment-detail-summary__notice">
+                        <i class="fa-solid fa-flask"></i>
+                        <p>
+                            PS Lounge uses simulated payments for this project. No real money or banking information is processed.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/payment.js' %}"></script>
+{% endblock %}

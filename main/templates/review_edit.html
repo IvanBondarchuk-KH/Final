@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Edit Review | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="review-edit-page">
+        <div class="container">
+            <div class="review-edit-page__header">
+                <div>
+                    <span class="review-edit-page__eyebrow">Community</span>
+                    <h1 class="review-edit-page__title">Edit Your Review</h1>
+                    <p class="review-edit-page__description">
+                        Update your experience with this Gaming Room.
+                    </p>
+                </div>
+
+                <a class="button button--secondary" href="{% url 'main:gaming_room_detail' review.gaming_room.slug %}">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back To Room
+                </a>
+            </div>
+
+            <div class="review-edit-page__grid">
+                <main class="review-form-card">
+                    <div class="review-form-card__header">
+                        <div class="review-form-card__icon">
+                            <i class="fa-solid fa-pen"></i>
+                        </div>
+                        <div>
+                            <span class="review-form-card__subtitle">Your Review</span>
+                            <h2 class="review-form-card__title">Update Experience</h2>
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="form-errors">
+                            <div class="form-errors__icon">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                            </div>
+                            <div>
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form class="review-form" method="post">
+                        {% csrf_token %}
+
+                        <div class="review-form__section">
+                            <div class="review-form__section-header">
+                                <span>Rating</span>
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.rating.id_for_label }}">
+                                    Your Rating
+                                </label>
+                                <div class="form-field__input-wrapper">
+                                    <i class="fa-solid fa-star"></i>
+                                    {{ form.rating }}
+                                </div>
+
+                                {% if form.rating.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.rating.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="review-form__section">
+                            <div class="review-form__section-header">
+                                <span>Experience</span>
+                                <i class="fa-regular fa-comment"></i>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-field__label" for="{{ form.comment.id_for_label }}">
+                                    Your Comment
+                                </label>
+                                <div class="form-field__textarea-wrapper">
+                                    {{ form.comment }}
+                                </div>
+
+                                {% if form.comment.errors %}
+                                    <div class="form-field__errors">
+                                        {% for error in form.comment.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="review-form__actions">
+                            <a class="button button--secondary" href="{% url 'main:gaming_room_detail' review.gaming_room.slug %}">
+                                Cancel
+                            </a>
+                            <button class="button button--primary" type="submit">
+                                <i class="fa-solid fa-check"></i>
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="review-form-card__danger-zone">
+                        <div>
+                            <span class="review-form-card__danger-title">Delete Review</span>
+                            <p>Permanently remove your review from this Gaming Room.</p>
+                        </div>
+
+                        <form method="post" action="{% url 'main:review_delete' review.id %}">
+                            {% csrf_token %}
+                            <button class="button button--danger" type="submit">
+                                <i class="fa-solid fa-trash"></i>
+                                Delete Review
+                            </button>
+                        </form>
+                    </div>
+                </main>
+
+                <aside class="review-preview-card">
+                    <span class="review-preview-card__subtitle">Gaming Room</span>
+
+                    <div class="review-preview-card__image">
+                        {% if review.gaming_room.image %}
+                            <img src="{{ review.gaming_room.image.url }}" alt="{{ review.gaming_room.title }}">
+                        {% else %}
+                            <div class="image-placeholder">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="review-preview-card__content">
+                        <span class="review-preview-card__category">
+                            {{ review.gaming_room.category.name }}
+                        </span>
+                        <h2>{{ review.gaming_room.title }}</h2>
+
+                        <div class="review-preview-card__rating">
+                            <i class="fa-solid fa-star"></i>
+                            <strong>{{ review.gaming_room.rating }}</strong>
+                            <span>Current Rating</span>
+                        </div>
+
+                        <div class="review-preview-card__divider"></div>
+
+                        <div class="review-preview-card__review">
+                            <span>Your Current Review</span>
+
+                            <div class="review-preview-card__review-rating">
+                                {% for star in "12345" %}
+                                    {% if review.rating >= forloop.counter %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            {% if review.comment %}
+                                <p>"{{ review.comment }}"</p>
+                            {% else %}
+                                <p class="review-preview-card__empty">
+                                    You haven't added a written comment.
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <span class="review-preview-card__date">
+                            <i class="fa-regular fa-calendar"></i>
+                            Posted {{ review.created_at|date:"d.m.Y" }}
+                        </span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/reviews.js' %}" defer></script>
+{% endblock %}

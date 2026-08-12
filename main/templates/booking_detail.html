@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Booking #{{ booking.id }} | PS Lounge
+{% endblock %}
+
+{% block content %}
+    <section class="booking-detail-page">
+        <div class="container">
+            <div class="booking-detail-page__header">
+                <div>
+                    <span class="booking-detail-page__eyebrow">Reservation</span>
+                    <h1 class="booking-detail-page__title">Booking #{{ booking.id }}</h1>
+                    <p class="booking-detail-page__description">
+                        Review the details of your Gaming Room reservation.
+                    </p>
+                </div>
+
+                <a class="button button--secondary" href="{% url 'main:profile' %}">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back To Profile
+                </a>
+            </div>
+
+            <div class="booking-detail-page__grid">
+                <main class="booking-detail-card">
+                    <div class="booking-detail-card__top">
+                        <div>
+                            <span class="booking-detail-card__subtitle">Gaming Session</span>
+                            <h2 class="booking-detail-card__title">{{ booking.gaming_room.title }}</h2>
+                        </div>
+
+                        <div class="booking-status booking-status--{{ booking.booking_status }}">
+                            {% if booking.booking_status == "pending" %}
+                                <i class="fa-regular fa-clock"></i>
+                            {% elif booking.booking_status == "confirmed" %}
+                                <i class="fa-solid fa-circle-check"></i>
+                            {% elif booking.booking_status == "cancelled" %}
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            {% elif booking.booking_status == "completed" %}
+                                <i class="fa-solid fa-check-double"></i>
+                            {% endif %}
+                            <span>{{ booking.get_booking_status_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="booking-detail-card__divider"></div>
+
+                    <div class="booking-detail-card__section">
+                        <div class="booking-detail-card__section-header">
+                            <span>Reservation Details</span>
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+
+                        <div class="booking-detail-info-grid">
+                            <div class="booking-detail-info">
+                                <span>Date</span>
+                                <strong>{{ booking.booking_date|date:"d.m.Y" }}</strong>
+                            </div>
+
+                            <div class="booking-detail-info">
+                                <span>Start Time</span>
+                                <strong>{{ booking.start_time|time:"H:i" }}</strong>
+                            </div>
+
+                            <div class="booking-detail-info">
+                                <span>End Time</span>
+                                <strong>{{ booking.end_time|time:"H:i" }}</strong>
+                            </div>
+
+                            <div class="booking-detail-info">
+                                <span>Duration</span>
+                                <strong>{{ booking.hours }} hour{{ booking.hours|pluralize }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-detail-card__section">
+                        <div class="booking-detail-card__section-header">
+                            <span>Gaming Details</span>
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+
+                        <div class="booking-game">
+                            <div class="booking-game__icon">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+
+                            <div>
+                                <span>Selected Game</span>
+                                <h3>{{ booking.selected_game.title }}</h3>
+                                {% if booking.selected_game.genre %}
+                                    <p>{{ booking.selected_game.genre }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-detail-card__section">
+                        <div class="booking-detail-card__section-header">
+                            <span>Customer</span>
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+
+                        <div class="booking-customer">
+                            <div class="booking-customer__avatar">
+                                {% if booking.user.profile.avatar %}
+                                    <img src="{{ booking.user.profile.avatar.url }}" alt="{{ booking.user.username }}">
+                                {% else %}
+                                    {{ booking.user.username|first|upper }}
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <strong>{{ booking.user.get_full_name|default:booking.user.username }}</strong>
+                                <span>{{ booking.user.email }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-detail-card__actions">
+                        <a class="button button--secondary" href="{% url 'main:gaming_room_detail' booking.gaming_room.slug %}">
+                            <i class="fa-solid fa-gamepad"></i>
+                            View Gaming Room
+                        </a>
+
+                        {% if booking.booking_status == "pending" %}
+                            <a class="button button--primary" href="{% url 'main:payment_create' booking.id %}">
+                                <i class="fa-regular fa-credit-card"></i>
+                                Continue To Payment
+                            </a>
+
+                            <form method="post" action="{% url 'main:booking_cancel' booking.id %}">
+                                {% csrf_token %}
+                                <button class="button button--danger" type="submit">
+                                    <i class="fa-solid fa-xmark"></i>
+                                    Cancel Booking
+                                </button>
+                            </form>
+                        {% elif booking.booking_status == "confirmed" %}
+                            {% if booking.payment %}
+                                <a class="button button--primary" href="{% url 'main:payment_detail' booking.payment.id %}">
+                                    <i class="fa-regular fa-credit-card"></i>
+                                    View Payment
+                                </a>
+                            {% endif %}
+
+                            <form method="post" action="{% url 'main:booking_cancel' booking.id %}">
+                                {% csrf_token %}
+                                <button class="button button--danger" type="submit">
+                                    <i class="fa-solid fa-xmark"></i>
+                                    Cancel Booking
+                                </button>
+                            </form>
+                        {% elif booking.booking_status == "cancelled" %}
+                            <span class="booking-detail-card__message">
+                                <i class="fa-solid fa-circle-info"></i>
+                                This booking has been cancelled.
+                            </span>
+                        {% elif booking.booking_status == "completed" %}
+                            <span class="booking-detail-card__message">
+                                <i class="fa-solid fa-circle-check"></i>
+                                This gaming session has been completed.
+                            </span>
+                        {% endif %}
+                    </div>
+                </main>
+
+                <aside class="booking-detail-summary">
+                    <div class="booking-detail-summary__header">
+                        <span>Payment Summary</span>
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+
+                    <div class="booking-detail-summary__room">
+                        {% if booking.gaming_room.image %}
+                            <img src="{{ booking.gaming_room.image.url }}" alt="{{ booking.gaming_room.title }}">
+                        {% else %}
+                            <div class="image-placeholder">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+                        {% endif %}
+
+                        <div>
+                            <span>Gaming Room</span>
+                            <strong>{{ booking.gaming_room.title }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="booking-detail-summary__divider"></div>
+
+                    <div class="booking-detail-summary__rows">
+                        <div>
+                            <span>Price per hour</span>
+                            <strong>{{ booking.gaming_room.price_per_hour }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Duration</span>
+                            <strong>{{ booking.hours }} hour{{ booking.hours|pluralize }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="booking-detail-summary__total">
+                        <span>Total</span>
+                        <strong>{{ booking.total_price }}</strong>
+                    </div>
+
+                    <div class="booking-detail-summary__payment-status">
+                        <span>Payment</span>
+                        {% if booking.payment %}
+                            <strong class="payment-status payment-status--{{ booking.payment.payment_status }}">
+                                {% if booking.payment.payment_status == "paid" %}
+                                    <i class="fa-solid fa-circle-check"></i>
+                                {% elif booking.payment.payment_status == "failed" %}
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-clock"></i>
+                                {% endif %}
+                                {{ booking.payment.get_payment_status_display }}
+                            </strong>
+                        {% else %}
+                            <strong class="payment-status payment-status--waiting">
+                                <i class="fa-regular fa-clock"></i>
+                                Waiting
+                            </strong>
+                        {% endif %}
+                    </div>
+
+                    {% if booking.booking_status == "pending" %}
+                        <a class="button button--primary button--full" href="{% url 'main:payment_create' booking.id %}">
+                            Pay {{ booking.total_price }}
+                        </a>
+                    {% elif booking.payment %}
+                        <a class="button button--secondary button--full" href="{% url 'main:payment_detail' booking.payment.id %}">
+                            View Payment Details
+                        </a>
+                    {% endif %}
+
+                    <p class="booking-detail-summary__note">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Payment is simulated. No real money will be charged.
+                    </p>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/booking.js' %}"></script>
+{% endblock %}
