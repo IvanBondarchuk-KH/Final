@@ -7968,3 +7968,9 @@ body.menu-open .navigation__menu-button span:nth-child(3) {
     }
 
 }
+
+.game-arena__overlay[hidden],
+.game-target[hidden],
+.game-result[hidden] {
+    display: none !important;
+}

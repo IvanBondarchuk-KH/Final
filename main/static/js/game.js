@@ -1,31 +1,71 @@
 document.addEventListener("DOMContentLoaded", () => {
     "use strict";
 
+    console.log("🎮 PS Lounge Game JS loaded");
+
     const game = document.querySelector(".game-page");
 
     if (!game) {
+        console.error("❌ .game-page not found");
         return;
     }
 
+    const arena = document.getElementById("game-arena");
     const target = document.getElementById("game-target");
-    const startButton = document.getElementById("game-start");
-    const stopButton = document.getElementById("game-stop");
 
-    const scoreElement = document.getElementById("game-score");
-    const levelElement = document.getElementById("game-level");
-    const timeElement = document.getElementById("game-time");
-    const statusElement = document.getElementById("game-status");
+    const startButton =
+        document.getElementById("game-start");
 
-    const overlay = document.getElementById("game-overlay");
+    const stopButton =
+        document.getElementById("game-stop");
 
-    const resultElement = document.getElementById("game-result");
-    const finalScoreElement = document.getElementById("final-score");
-    const finalLevelElement = document.getElementById("final-level");
-    const finalTimeElement = document.getElementById("final-time");
+    const restartButton =
+        document.getElementById("game-restart");
 
-    const restartButton = document.getElementById("game-restart");
+    const scoreElement =
+        document.getElementById("game-score");
+
+    const levelElement =
+        document.getElementById("game-level");
+
+    const timeElement =
+        document.getElementById("game-time");
+
+    const statusElement =
+        document.getElementById("game-status");
+
+    const overlay =
+        document.getElementById("game-overlay");
+
+    const resultElement =
+        document.getElementById("game-result");
+
+    const finalScoreElement =
+        document.getElementById("final-score");
+
+    const finalLevelElement =
+        document.getElementById("final-level");
+
+    const finalTimeElement =
+        document.getElementById("final-time");
+
+    // ==========================================
+    // CHECK ELEMENTS
+    // ==========================================
+
+    console.log("Game elements:", {
+        game,
+        arena,
+        target,
+        startButton,
+        stopButton,
+        scoreElement,
+        levelElement,
+        timeElement,
+    });
 
     if (
+        !arena ||
         !target ||
         !startButton ||
         !stopButton ||
@@ -33,8 +73,16 @@ document.addEventListener("DOMContentLoaded", () => {
         !levelElement ||
         !timeElement
     ) {
+        console.error(
+            "❌ Game initialization failed. Missing elements."
+        );
+
         return;
     }
+
+    // ==========================================
+    // CONFIG
+    // ==========================================
 
     const scoreUrl =
         game.dataset.scoreUrl ||
@@ -42,13 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const csrfToken =
         game.dataset.csrfToken ||
-        document.querySelector(
-            "[name=csrfmiddlewaretoken]"
-        )?.value ||
         getCookie("csrftoken");
 
     const GAME_DURATION = 30;
-    const LEVEL_SCORE_STEP = 10;
+
+    // ==========================================
+    // STATE
+    // ==========================================
 
     let score = 0;
     let level = 1;
@@ -57,15 +105,20 @@ document.addEventListener("DOMContentLoaded", () => {
     let gameRunning = false;
 
     let timerInterval = null;
-    let targetTimeout = null;
 
     let gameStartedAt = null;
 
+    // ==========================================
+    // COOKIE
+    // ==========================================
+
     function getCookie(name) {
-        const cookies = document.cookie.split(";");
+        const cookies =
+            document.cookie.split(";");
 
         for (const cookie of cookies) {
-            const trimmed = cookie.trim();
+            const trimmed =
+                cookie.trim();
 
             if (
                 trimmed.startsWith(
@@ -83,68 +136,103 @@ document.addEventListener("DOMContentLoaded", () => {
         return null;
     }
 
+    // ==========================================
+    // UI
+    // ==========================================
+
     function updateInterface() {
-        scoreElement.textContent = score;
-        levelElement.textContent = level;
-        timeElement.textContent = timeLeft;
+        scoreElement.textContent =
+            String(score);
+
+        levelElement.textContent =
+            String(level);
+
+        timeElement.textContent =
+            String(timeLeft);
     }
 
     function setStatus(text) {
         if (statusElement) {
-            statusElement.textContent = text;
+            statusElement.textContent =
+                text;
         }
     }
 
-    function calculateLevel() {
-        return (
-            Math.floor(
-                score / LEVEL_SCORE_STEP
-            ) + 1
-        );
+    // ==========================================
+    // LEVEL
+    // ==========================================
+
+    function updateLevel() {
+        level =
+            Math.floor(score / 10) + 1;
+
+        levelElement.textContent =
+            String(level);
     }
 
-    function getTargetSize() {
-        return Math.max(
-            46,
-            82 - (level - 1) * 6
-        );
-    }
+    // ==========================================
+    // TARGET POSITION
+    // ==========================================
 
     function positionTarget() {
         const arenaWidth =
-            game.clientWidth;
+            arena.clientWidth;
 
         const arenaHeight =
-            game.clientHeight;
+            arena.clientHeight;
 
         const targetSize =
-            getTargetSize();
+            Math.max(
+                46,
+                82 -
+                    (level - 1) * 6
+            );
 
-        const padding = 20;
+        const padding = 40;
 
-        const maxX = Math.max(
-            padding,
+        /*
+         * Because CSS uses:
+         *
+         * transform:
+         * translate(-50%, -50%);
+         *
+         * left/top are the center
+         * coordinates.
+         */
+
+        const minX =
+            padding +
+            targetSize / 2;
+
+        const maxX =
             arenaWidth -
-                targetSize -
-                padding
-        );
+            padding -
+            targetSize / 2;
 
-        const maxY = Math.max(
-            padding,
+        const minY =
+            padding +
+            targetSize / 2;
+
+        const maxY =
             arenaHeight -
-                targetSize -
-                padding
-        );
+            padding -
+            targetSize / 2;
 
         const x =
+            minX +
             Math.random() *
-                (maxX - padding) +
-            padding;
+                Math.max(
+                    0,
+                    maxX - minX
+                );
 
         const y =
+            minY +
             Math.random() *
-                (maxY - padding) +
-            padding;
+                Math.max(
+                    0,
+                    maxY - minY
+                );
 
         target.style.width =
             `${targetSize}px`;
@@ -157,82 +245,152 @@ document.addEventListener("DOMContentLoaded", () => {
 
         target.style.top =
             `${y}px`;
-    }
 
-    function getTargetDelay() {
-        return Math.max(
-            350,
-            1000 -
-                (level - 1) * 90
+        console.log(
+            "🎯 Target positioned:",
+            {
+                x,
+                y,
+                size: targetSize,
+            }
         );
     }
 
-    function scheduleTarget() {
-        if (!gameRunning) {
-            return;
-        }
-
-        clearTimeout(targetTimeout);
-
-        targetTimeout = setTimeout(
-            () => {
-                if (!gameRunning) {
-                    return;
-                }
-
-                positionTarget();
-                scheduleTarget();
-            },
-            getTargetDelay()
-        );
-    }
-
-    function stopTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
-    }
-
-    function stopTargetMovement() {
-        if (targetTimeout) {
-            clearTimeout(targetTimeout);
-            targetTimeout = null;
-        }
-    }
-
-    function updateLevel() {
-        const newLevel =
-            calculateLevel();
-
-        if (newLevel !== level) {
-            level = newLevel;
-
-            setStatus(
-                `Level ${level}!`
-            );
-        }
-    }
+    // ==========================================
+    // REGISTER HIT
+    // ==========================================
 
     function registerHit() {
+        console.log(
+            "🟢 registerHit() called"
+        );
+
+        console.log(
+            "Game running:",
+            gameRunning
+        );
+
+        console.log(
+            "Score before:",
+            score
+        );
+
         if (!gameRunning) {
+            console.warn(
+                "⚠️ Click ignored because game is not running."
+            );
+
             return;
         }
 
         score += 1;
 
         updateLevel();
+
         updateInterface();
 
         setStatus(
-            "Nice! Hit the next target."
+            `Hit! Score: ${score}`
         );
 
+        console.log(
+            "🔥 HIT!",
+            {
+                score,
+                level,
+            }
+        );
+
+        /*
+         * Move target after successful hit.
+         */
         positionTarget();
-        scheduleTarget();
     }
 
+    // ==========================================
+    // VERY IMPORTANT:
+    // CLICK HANDLER ON ARENA
+    // ==========================================
+
+    arena.addEventListener(
+        "click",
+        (event) => {
+            console.log(
+                "🖱️ Arena click:",
+                event.target
+            );
+
+            const clickedTarget =
+                event.target.closest(
+                    "#game-target"
+                );
+
+            if (!clickedTarget) {
+                return;
+            }
+
+            console.log(
+                "🎯 TARGET CLICK DETECTED!"
+            );
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            registerHit();
+        }
+    );
+
+    // ==========================================
+    // START GAME
+    // ==========================================
+
+    function startGame() {
+        console.log(
+            "▶️ START GAME"
+        );
+
+        score = 0;
+        level = 1;
+        timeLeft =
+            GAME_DURATION;
+
+        gameRunning = true;
+
+        gameStartedAt =
+            Date.now();
+
+        updateInterface();
+
+        setStatus(
+            "Game started! Hit the target!"
+        );
+
+        if (overlay) {
+            overlay.hidden = true;
+        }
+
+        target.hidden = false;
+
+        startButton.disabled = true;
+        stopButton.disabled = false;
+
+        positionTarget();
+
+        startTimer();
+
+        console.log(
+            "✅ Game running:",
+            gameRunning
+        );
+    }
+
+    // ==========================================
+    // TIMER
+    // ==========================================
+
     function startTimer() {
+        stopTimer();
+
         timerInterval =
             setInterval(() => {
                 if (!gameRunning) {
@@ -241,123 +399,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 timeLeft -= 1;
 
+                if (timeLeft < 0) {
+                    timeLeft = 0;
+                }
+
                 updateInterface();
 
-                if (timeLeft <= 0) {
-                    timeLeft = 0;
-                    updateInterface();
+                if (timeLeft === 0) {
                     finishGame();
                 }
             }, 1000);
     }
 
-    function showResult(gameTime) {
-        if (!resultElement) {
-            return;
-        }
+    function stopTimer() {
+        if (
+            timerInterval !== null
+        ) {
+            clearInterval(
+                timerInterval
+            );
 
-        finalScoreElement.textContent =
-            score;
-
-        finalLevelElement.textContent =
-            level;
-
-        finalTimeElement.textContent =
-            gameTime;
-
-        resultElement.hidden =
-            false;
-    }
-
-    function hideResult() {
-        if (resultElement) {
-            resultElement.hidden =
-                true;
+            timerInterval = null;
         }
     }
 
-    async function saveScore(gameTime) {
-        if (!scoreUrl) {
-            setStatus(
-                "Game finished."
-            );
-            return;
-        }
-
-        try {
-            const response =
-                await fetch(
-                    scoreUrl,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-
-                            "X-CSRFToken":
-                                csrfToken || "",
-
-                            "X-Requested-With":
-                                "XMLHttpRequest",
-                        },
-
-                        body:
-                            JSON.stringify({
-                                score: score,
-                                level: level,
-                                game_time:
-                                    gameTime,
-                            }),
-                    }
-                );
-
-            const data =
-                await response.json();
-
-            if (
-                !response.ok ||
-                !data.success
-            ) {
-                throw new Error(
-                    data.error ||
-                        "Failed to save score."
-                );
-            }
-
-            setStatus(
-                "Score saved successfully!"
-            );
-
-        } catch (error) {
-            console.error(
-                "Game score error:",
-                error
-            );
-
-            setStatus(
-                "Game finished, but score could not be saved."
-            );
-        }
-    }
+    // ==========================================
+    // FINISH GAME
+    // ==========================================
 
     function finishGame() {
         if (!gameRunning) {
             return;
         }
 
+        console.log(
+            "🏁 GAME FINISHED",
+            {
+                score,
+                level,
+                timeLeft,
+            }
+        );
+
         gameRunning = false;
 
         stopTimer();
-        stopTargetMovement();
 
         target.hidden = true;
 
-        startButton.disabled =
-            false;
-
-        stopButton.disabled =
-            true;
+        startButton.disabled = false;
+        stopButton.disabled = true;
 
         const gameTime =
             Math.max(
@@ -377,55 +468,53 @@ document.addEventListener("DOMContentLoaded", () => {
             `Game Over — Score: ${score}`
         );
 
-        showResult(
-            gameTime
-        );
+        showResult(gameTime);
 
-        saveScore(
-            gameTime
-        );
+        saveScore(gameTime);
     }
 
-    function startGame() {
-        stopTimer();
-        stopTargetMovement();
+    // ==========================================
+    // RESULT
+    // ==========================================
 
-        score = 0;
-        level = 1;
-        timeLeft =
-            GAME_DURATION;
-
-        gameRunning = true;
-
-        gameStartedAt =
-            Date.now();
-
-        hideResult();
-
-        if (overlay) {
-            overlay.hidden = true;
+    function showResult(gameTime) {
+        if (!resultElement) {
+            return;
         }
 
-        target.hidden = false;
+        if (finalScoreElement) {
+            finalScoreElement.textContent =
+                String(score);
+        }
 
-        startButton.disabled =
-            true;
+        if (finalLevelElement) {
+            finalLevelElement.textContent =
+                String(level);
+        }
 
-        stopButton.disabled =
-            false;
+        if (finalTimeElement) {
+            finalTimeElement.textContent =
+                String(gameTime);
+        }
 
-        updateInterface();
-
-        setStatus(
-            "Game started! Hit the target!"
-        );
-
-        positionTarget();
-        startTimer();
-        scheduleTarget();
+        resultElement.hidden = false;
     }
 
+    function hideResult() {
+        if (resultElement) {
+            resultElement.hidden = true;
+        }
+    }
+
+    // ==========================================
+    // STOP GAME
+    // ==========================================
+
     function stopGame() {
+        console.log(
+            "⏹ STOP GAME"
+        );
+
         if (!gameRunning) {
             return;
         }
@@ -433,15 +522,98 @@ document.addEventListener("DOMContentLoaded", () => {
         finishGame();
     }
 
-    target.addEventListener(
-        "click",
-        (event) => {
-            event.preventDefault();
-            event.stopPropagation();
+    // ==========================================
+    // SAVE SCORE
+    // ==========================================
 
-            registerHit();
+    async function saveScore(gameTime) {
+        console.log(
+            "💾 Saving score:",
+            {
+                score,
+                level,
+                gameTime,
+            }
+        );
+
+        try {
+            const formData =
+                new URLSearchParams();
+
+            formData.append(
+                "score",
+                String(score)
+            );
+
+            formData.append(
+                "level",
+                String(level)
+            );
+
+            formData.append(
+                "game_time",
+                String(gameTime)
+            );
+
+            const response =
+                await fetch(
+                    scoreUrl,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded; charset=UTF-8",
+
+                            "X-CSRFToken":
+                                csrfToken || "",
+
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+                        },
+
+                        body:
+                            formData.toString(),
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            console.log(
+                "Server response:",
+                data
+            );
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+                throw new Error(
+                    data.error ||
+                    "Score saving failed."
+                );
+            }
+
+            setStatus(
+                "Score saved successfully!"
+            );
+
+        } catch (error) {
+            console.error(
+                "❌ Score save error:",
+                error
+            );
+
+            setStatus(
+                "Game finished, but score could not be saved."
+            );
         }
-    );
+    }
+
+    // ==========================================
+    // BUTTONS
+    // ==========================================
 
     startButton.addEventListener(
         "click",
@@ -467,10 +639,16 @@ document.addEventListener("DOMContentLoaded", () => {
             (event) => {
                 event.preventDefault();
 
+                hideResult();
+
                 startGame();
             }
         );
     }
+
+    // ==========================================
+    // RESIZE
+    // ==========================================
 
     window.addEventListener(
         "resize",
@@ -481,10 +659,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     );
 
+    // ==========================================
+    // INITIAL STATE
+    // ==========================================
+
     target.hidden = true;
 
-    stopButton.disabled =
-        true;
+    stopButton.disabled = true;
 
     hideResult();
 
@@ -492,5 +673,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setStatus(
         "Press Start Game to begin."
+    );
+
+    console.log(
+        "✅ PS Lounge Game initialized"
     );
 });

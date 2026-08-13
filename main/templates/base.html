@@ -1,801 +1,242 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#05070c">
+    <meta name="description" content="PS Lounge — premium PlayStation gaming rooms and gaming experience.">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>{% block title %}PS Lounge{% endblock %}</title>
 
-    <meta
-        name="theme-color"
-        content="#05070c"
-    >
-
-    <meta
-        name="description"
-        content="PS Lounge — premium PlayStation gaming rooms and gaming experience."
-    >
-
-    <title>
-        {% block title %}
-            PS Lounge
-        {% endblock %}
-    </title>
-
-    <link
-        rel="preconnect"
-        href="https://cdnjs.cloudflare.com"
-    >
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="{% static 'css/style.css' %}"
-    >
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     {% block extra_css %}{% endblock %}
-
 </head>
-
 <body>
 
-    <!-- =====================================================
-         GLOBAL BACKGROUND ATMOSPHERE
-         ===================================================== -->
-
-    <div
-        class="site-atmosphere"
-        aria-hidden="true"
-    >
-
+    <div class="site-atmosphere" aria-hidden="true">
         <div class="site-atmosphere__glow site-atmosphere__glow--one"></div>
-
         <div class="site-atmosphere__glow site-atmosphere__glow--two"></div>
-
         <div class="site-atmosphere__glow site-atmosphere__glow--three"></div>
-
         <div class="site-atmosphere__grid"></div>
-
     </div>
 
-
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
-
-    <header
-        class="site-header"
-        data-header
-    >
-
+    <header class="site-header" data-header>
         <div class="container">
-
-            <nav
-                class="navigation"
-                aria-label="Main navigation"
-            >
-
-                <!-- BRAND -->
-
-                <a
-                    class="navigation__logo"
-                    href="{% url 'main:home' %}"
-                    aria-label="PS Lounge Home"
-                >
-
-                    <span class="navigation__logo-mark">
-                        PS
-                    </span>
-
+            <nav class="navigation" aria-label="Main navigation">
+                
+                <a class="navigation__logo" href="{% url 'main:home' %}" aria-label="PS Lounge Home">
+                    <span class="navigation__logo-mark">PS</span>
                     <span class="navigation__logo-content">
-
-                        <span class="navigation__logo-text">
-                            Lounge
-                        </span>
-
-                        <span class="navigation__logo-subtitle">
-                            PlayStation Experience
-                        </span>
-
+                        <span class="navigation__logo-text">Lounge</span>
+                        <span class="navigation__logo-subtitle">PlayStation Experience</span>
                     </span>
-
                 </a>
 
-
-                <!-- DESKTOP NAVIGATION -->
-
-                <div
-                    class="navigation__links"
-                    data-mobile-menu
-                    aria-hidden="true"
-                >
-
+                <div class="navigation__links" data-mobile-menu aria-hidden="true">
                     <div class="navigation__links-header">
-
-                        <span>
-                            Navigation
-                        </span>
-
+                        <span>Navigation</span>
                     </div>
 
-
-                    <a
-                        class="navigation__link"
-                        data-nav-link
-                        href="{% url 'main:home' %}"
-                    >
-
-                        <span class="navigation__link-icon">
-                            <i class="fa-solid fa-house"></i>
-                        </span>
-
-                        <span>
-                            Home
-                        </span>
-
+                    <a class="navigation__link" data-nav-link href="{% url 'main:home' %}">
+                        <span class="navigation__link-icon"><i class="fa-solid fa-house"></i></span>
+                        <span>Home</span>
                     </a>
 
-
-                    <a
-                        class="navigation__link"
-                        data-nav-link
-                        href="{% url 'main:gaming_rooms' %}"
-                    >
-
-                        <span class="navigation__link-icon">
-                            <i class="fa-solid fa-gamepad"></i>
-                        </span>
-
-                        <span>
-                            Gaming Rooms
-                        </span>
-
+                    <a class="navigation__link" data-nav-link href="{% url 'main:gaming_rooms' %}">
+                        <span class="navigation__link-icon"><i class="fa-solid fa-gamepad"></i></span>
+                        <span>Gaming Rooms</span>
                     </a>
-
 
                     {% if user.is_authenticated %}
-
-                        <a
-                            class="navigation__link"
-                            data-nav-link
-                            href="{% url 'main:leaderboard' %}"
-                        >
-
-                            <span class="navigation__link-icon">
-                                <i class="fa-solid fa-trophy"></i>
-                            </span>
-
-                            <span>
-                                Leaderboard
-                            </span>
-
+                        <a class="navigation__link" data-nav-link href="{% url 'main:leaderboard' %}">
+                            <span class="navigation__link-icon"><i class="fa-solid fa-trophy"></i></span>
+                            <span>Leaderboard</span>
                         </a>
 
-
-                        <a
-                            class="navigation__link"
-                            data-nav-link
-                            href="{% url 'main:game' %}"
-                        >
-
-                            <span class="navigation__link-icon">
-                                <i class="fa-solid fa-bolt"></i>
-                            </span>
-
-                            <span>
-                                Game
-                            </span>
-
+                        <a class="navigation__link" data-nav-link href="{% url 'main:game' %}">
+                            <span class="navigation__link-icon"><i class="fa-solid fa-bolt"></i></span>
+                            <span>Game</span>
                         </a>
 
-
-                        <a
-                            class="navigation__link"
-                            data-nav-link
-                            href="{% url 'main:chat' %}"
-                        >
-
-                            <span class="navigation__link-icon">
-                                <i class="fa-regular fa-comments"></i>
-                            </span>
-
-                            <span>
-                                Chat
-                            </span>
-
+                        <a class="navigation__link" data-nav-link href="{% url 'main:chat' %}">
+                            <span class="navigation__link-icon"><i class="fa-regular fa-comments"></i></span>
+                            <span>Chat</span>
                         </a>
-
                     {% endif %}
-
                 </div>
 
-
-                <!-- RIGHT SIDE ACTIONS -->
-
                 <div class="navigation__actions">
-
-
                     {% if user.is_authenticated %}
-
-                        <a
-                            class="navigation__action"
-                            href="{% url 'main:favorites' %}"
-                            aria-label="Favorites"
-                            title="Favorites"
-                        >
-
+                        <a class="navigation__action" href="{% url 'main:favorites' %}" aria-label="Favorites" title="Favorites">
                             <i class="fa-regular fa-heart"></i>
-
                             <span class="navigation__action-glow"></span>
-
                         </a>
 
-
-                        <a
-                            class="navigation__action"
-                            href="{% url 'main:profile' %}"
-                            aria-label="Profile"
-                            title="Profile"
-                        >
-
+                        <a class="navigation__action" href="{% url 'main:profile' %}" aria-label="Profile" title="Profile">
                             <i class="fa-regular fa-user"></i>
-
                             <span class="navigation__action-glow"></span>
-
                         </a>
 
-
-                        <form
-                            class="navigation__logout"
-                            method="post"
-                            action="{% url 'main:logout' %}"
-                        >
-
+                        <form class="navigation__logout" method="post" action="{% url 'main:logout' %}">
                             {% csrf_token %}
-
-                            <button
-                                class="navigation__action"
-                                type="submit"
-                                aria-label="Logout"
-                                title="Logout"
-                            >
-
+                            <button class="navigation__action" type="submit" aria-label="Logout" title="Logout">
                                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
-
                                 <span class="navigation__action-glow"></span>
-
                             </button>
-
                         </form>
-
-
                     {% else %}
-
-                        <a
-                            class="navigation__login"
-                            href="{% url 'main:login' %}"
-                        >
-                            Login
+                        <a class="navigation__login" href="{% url 'main:login' %}">Login</a>
+                        <a class="button button--small button--primary navigation__register" href="{% url 'main:register' %}">
+                            <i class="fa-solid fa-user-plus"></i> Register
                         </a>
-
-
-                        <a
-                            class="button button--small button--primary navigation__register"
-                            href="{% url 'main:register' %}"
-                        >
-
-                            <i class="fa-solid fa-user-plus"></i>
-
-                            Register
-
-                        </a>
-
                     {% endif %}
 
-
-                    <!-- MOBILE MENU -->
-
-                    <button
-                        type="button"
-                        class="navigation__menu-button"
-                        data-mobile-menu-toggle
-                        aria-expanded="false"
-                        aria-label="Open navigation menu"
-                    >
-
+                    <button type="button" class="navigation__menu-button" data-mobile-menu-toggle aria-expanded="false" aria-label="Open navigation menu">
                         <span></span>
                         <span></span>
                         <span></span>
-
                     </button>
-
                 </div>
 
             </nav>
-
         </div>
 
-
-        <!-- HEADER STATUS LINE -->
-
-        <div
-            class="site-header__status"
-            aria-hidden="true"
-        >
-
+        <div class="site-header__status" aria-hidden="true">
             <div class="site-header__status-line"></div>
-
-            <span class="site-header__status-label">
-                PS Lounge Online
-            </span>
-
+            <span class="site-header__status-label">PS Lounge Online</span>
             <span class="site-header__status-dot"></span>
-
         </div>
-
     </header>
-
-
-    <!-- =====================================================
-         MAIN
-         ===================================================== -->
 
     <main class="site-main">
 
-
-        <!-- GLOBAL NOTIFICATIONS -->
-
         {% if messages %}
-
-            <div
-                class="messages"
-                data-notifications
-                aria-live="polite"
-                aria-atomic="true"
-            >
-
+            <div class="messages" data-notifications aria-live="polite" aria-atomic="true">
                 <div class="container">
-
                     {% for message in messages %}
-
-                        <div
-                            class="message message--{{ message.tags }}"
-                            data-notification
-                            role="alert"
-                        >
-
+                        <div class="message message--{{ message.tags }}" data-notification role="alert">
                             <span class="message__icon">
-
                                 {% if message.tags == "success" %}
-
                                     <i class="fa-solid fa-circle-check"></i>
-
                                 {% elif message.tags == "error" %}
-
                                     <i class="fa-solid fa-circle-exclamation"></i>
-
                                 {% elif message.tags == "warning" %}
-
                                     <i class="fa-solid fa-triangle-exclamation"></i>
-
                                 {% else %}
-
                                     <i class="fa-solid fa-circle-info"></i>
-
                                 {% endif %}
-
                             </span>
 
+                            <span class="message__text">{{ message }}</span>
 
-                            <span class="message__text">
-                                {{ message }}
-                            </span>
-
-
-                            <button
-                                type="button"
-                                class="message__close"
-                                data-notification-close
-                                aria-label="Close notification"
-                            >
-
+                            <button type="button" class="message__close" data-notification-close aria-label="Close notification">
                                 <i class="fa-solid fa-xmark"></i>
-
                             </button>
 
-
-                            <span
-                                class="message__progress"
-                                data-notification-progress
-                            ></span>
-
+                            <span class="message__progress" data-notification-progress></span>
                         </div>
-
                     {% endfor %}
-
                 </div>
-
             </div>
-
         {% endif %}
-
-
-        <!-- PAGE CONTENT -->
 
         {% block content %}{% endblock %}
 
     </main>
 
-
-    <!-- =====================================================
-         FOOTER
-         ===================================================== -->
-
     <footer class="site-footer">
-
         <div class="site-footer__glow"></div>
 
-
         <div class="container">
-
             <div class="site-footer__main">
 
-
-                <!-- BRAND -->
-
                 <div class="site-footer__brand">
-
-                    <a
-                        class="site-footer__logo"
-                        href="{% url 'main:home' %}"
-                    >
-
-                        <span class="site-footer__logo-mark">
-                            PS
-                        </span>
-
+                    <a class="site-footer__logo" href="{% url 'main:home' %}">
+                        <span class="site-footer__logo-mark">PS</span>
                         <span class="site-footer__logo-content">
-
-                            <span class="site-footer__logo-text">
-                                Lounge
-                            </span>
-
-                            <span class="site-footer__logo-subtitle">
-                                PlayStation Experience
-                            </span>
-
+                            <span class="site-footer__logo-text">Lounge</span>
+                            <span class="site-footer__logo-subtitle">PlayStation Experience</span>
                         </span>
-
                     </a>
-
 
                     <p class="site-footer__description">
-
-                        Premium gaming rooms engineered for
-                        unforgettable PlayStation sessions,
-                        competitive nights and next-level
-                        entertainment.
-
+                        Premium gaming rooms engineered for unforgettable PlayStation sessions, competitive nights and next-level entertainment.
                     </p>
 
-
                     <div class="site-footer__status">
-
                         <span class="site-footer__status-dot"></span>
-
-                        <span>
-                            PS Lounge Experience
-                        </span>
-
+                        <span>PS Lounge Experience</span>
                     </div>
-
                 </div>
-
-
-                <!-- NAVIGATION -->
 
                 <div class="site-footer__navigation">
-
-
                     <div class="site-footer__column">
-
-                        <h3 class="site-footer__title">
-                            Explore
-                        </h3>
-
-
-                        <a
-                            class="site-footer__link"
-                            href="{% url 'main:home' %}"
-                        >
-
-                            <i class="fa-solid fa-arrow-right"></i>
-
-                            Home
-
-                        </a>
-
-
-                        <a
-                            class="site-footer__link"
-                            href="{% url 'main:gaming_rooms' %}"
-                        >
-
-                            <i class="fa-solid fa-arrow-right"></i>
-
-                            Gaming Rooms
-
-                        </a>
-
-
+                        <h3 class="site-footer__title">Explore</h3>
+                        <a class="site-footer__link" href="{% url 'main:home' %}"><i class="fa-solid fa-arrow-right"></i> Home</a>
+                        <a class="site-footer__link" href="{% url 'main:gaming_rooms' %}"><i class="fa-solid fa-arrow-right"></i> Gaming Rooms</a>
                         {% if user.is_authenticated %}
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:leaderboard' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Leaderboard
-
-                            </a>
-
+                            <a class="site-footer__link" href="{% url 'main:leaderboard' %}"><i class="fa-solid fa-arrow-right"></i> Leaderboard</a>
                         {% endif %}
-
                     </div>
 
-
                     <div class="site-footer__column">
-
-                        <h3 class="site-footer__title">
-                            Account
-                        </h3>
-
-
+                        <h3 class="site-footer__title">Account</h3>
                         {% if user.is_authenticated %}
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:profile' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Profile
-
-                            </a>
-
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:favorites' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Favorites
-
-                            </a>
-
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:chat' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Chat
-
-                            </a>
-
-
+                            <a class="site-footer__link" href="{% url 'main:profile' %}"><i class="fa-solid fa-arrow-right"></i> Profile</a>
+                            <a class="site-footer__link" href="{% url 'main:favorites' %}"><i class="fa-solid fa-arrow-right"></i> Favorites</a>
+                            <a class="site-footer__link" href="{% url 'main:chat' %}"><i class="fa-solid fa-arrow-right"></i> Chat</a>
                         {% else %}
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:login' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Login
-
-                            </a>
-
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:register' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Register
-
-                            </a>
-
+                            <a class="site-footer__link" href="{% url 'main:login' %}"><i class="fa-solid fa-arrow-right"></i> Login</a>
+                            <a class="site-footer__link" href="{% url 'main:register' %}"><i class="fa-solid fa-arrow-right"></i> Register</a>
                         {% endif %}
-
                     </div>
-
 
                     <div class="site-footer__column">
-
-                        <h3 class="site-footer__title">
-                            Experience
-                        </h3>
-
-
+                        <h3 class="site-footer__title">Experience</h3>
                         {% if user.is_authenticated %}
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:game' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Play Game
-
-                            </a>
-
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:leaderboard' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Leaderboard
-
-                            </a>
-
-
+                            <a class="site-footer__link" href="{% url 'main:game' %}"><i class="fa-solid fa-arrow-right"></i> Play Game</a>
+                            <a class="site-footer__link" href="{% url 'main:leaderboard' %}"><i class="fa-solid fa-arrow-right"></i> Leaderboard</a>
                         {% else %}
-
-                            <a
-                                class="site-footer__link"
-                                href="{% url 'main:register' %}"
-                            >
-
-                                <i class="fa-solid fa-arrow-right"></i>
-
-                                Join PS Lounge
-
-                            </a>
-
+                            <a class="site-footer__link" href="{% url 'main:register' %}"><i class="fa-solid fa-arrow-right"></i> Join PS Lounge</a>
                         {% endif %}
-
                     </div>
-
                 </div>
 
             </div>
-
-
-            <!-- FOOTER BOTTOM -->
 
             <div class="site-footer__bottom">
-
-
                 <div class="site-footer__copyright">
-
-                    <span>
-                        &copy; {% now "Y" %} PS Lounge
-                    </span>
-
-                    <span class="site-footer__copyright-divider">
-                        /
-                    </span>
-
-                    <span>
-                        All rights reserved.
-                    </span>
-
+                    <span>&copy; {% now "Y" %} PS Lounge</span>
+                    <span class="site-footer__copyright-divider">/</span>
+                    <span>All rights reserved.</span>
                 </div>
-
 
                 <div class="site-footer__socials">
-
-
-                    <a
-                        class="site-footer__social"
-                        href="#"
-                        aria-label="Instagram"
-                    >
-
-                        <i class="fa-brands fa-instagram"></i>
-
-                    </a>
-
-
-                    <a
-                        class="site-footer__social"
-                        href="#"
-                        aria-label="Discord"
-                    >
-
-                        <i class="fa-brands fa-discord"></i>
-
-                    </a>
-
-
-                    <a
-                        class="site-footer__social"
-                        href="#"
-                        aria-label="Telegram"
-                    >
-
-                        <i class="fa-brands fa-telegram"></i>
-
-                    </a>
-
+                    <a class="site-footer__social" href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a class="site-footer__social" href="#" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+                    <a class="site-footer__social" href="#" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
                 </div>
-
             </div>
 
-
-            <!-- FOOTER SIGNATURE -->
-
             <div class="site-footer__signature">
-
                 <span class="site-footer__signature-line"></span>
-
-                <span>
-                    PLAY. COMPETE. EXPERIENCE.
-                </span>
-
+                <span>PLAY. COMPETE. EXPERIENCE.</span>
                 <span class="site-footer__signature-line"></span>
-
             </div>
 
         </div>
-
     </footer>
 
-
-    <!-- =====================================================
-         BACK TO TOP
-         ===================================================== -->
-
-    <button
-        type="button"
-        class="back-to-top"
-        data-back-to-top
-        aria-label="Back to top"
-    >
-
+    <button type="button" class="back-to-top" data-back-to-top aria-label="Back to top">
         <i class="fa-solid fa-arrow-up"></i>
-
     </button>
 
-
-    <!-- =====================================================
-         GLOBAL JS
-         ===================================================== -->
-
-    <script
-        src="{% static 'js/notifications.js' %}"
-        defer
-    ></script>
-
-    <script
-        src="{% static 'js/base.js' %}"
-        defer
-    ></script>
-
+    <script src="{% static 'js/notifications.js' %}" defer></script>
+    <script src="{% static 'js/base.js' %}" defer></script>
 
     {% block extra_js %}{% endblock %}
 
