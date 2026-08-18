@@ -166,6 +166,7 @@ def gaming_room_detail(request, slug):
     )
 
     is_favorite = False
+    user_review = None
 
     if request.user.is_authenticated:
         is_favorite = Favorite.objects.filter(
@@ -173,18 +174,10 @@ def gaming_room_detail(request, slug):
             gaming_room=gaming_room,
         ).exists()
 
-    review_form = ReviewForm()
-
-    if request.user.is_authenticated:
-        review = Review.objects.filter(
+        user_review = Review.objects.filter(
             user=request.user,
             gaming_room=gaming_room,
         ).first()
-
-        if review:
-            review_form = ReviewForm(
-                instance=review,
-            )
 
     return render(
         request,
@@ -192,7 +185,7 @@ def gaming_room_detail(request, slug):
         {
             "gaming_room": gaming_room,
             "is_favorite": is_favorite,
-            "review_form": review_form,
+            "user_review": user_review,
         },
     )
 
@@ -433,8 +426,11 @@ def change_password(request):
 
 
 @login_required
-@transaction.atomic
 def booking_create(request, slug):
+    """
+    Step 1: validate the booking form and show a confirmation screen.
+    The booking is NOT created until the user explicitly confirms it.
+    """
     gaming_room = get_object_or_404(
         GamingRoom,
         slug=slug,
@@ -448,21 +444,10 @@ def booking_create(request, slug):
         )
 
         if form.is_valid():
-            booking_date = form.cleaned_data[
-                "booking_date"
-            ]
-
-            start_time = form.cleaned_data[
-                "start_time"
-            ]
-
-            hours = form.cleaned_data[
-                "hours"
-            ]
-
-            selected_game = form.cleaned_data[
-                "selected_game"
-            ]
+            booking_date = form.cleaned_data["booking_date"]
+            start_time = form.cleaned_data["start_time"]
+            hours = form.cleaned_data["hours"]
+            selected_game = form.cleaned_data["selected_game"]
 
             if not gaming_room.games.filter(
                 pk=selected_game.pk,
@@ -479,82 +464,54 @@ def booking_create(request, slug):
                 )
 
             else:
-                end_datetime = (
-                    datetime.combine(
-                        booking_date,
-                        start_time,
-                    )
-                )
+                from datetime import timedelta
 
-                end_datetime = (
-                    end_datetime
-                    + __import__(
-                        "datetime"
-                    ).timedelta(
-                        hours=hours,
-                    )
-                )
+                end_datetime = datetime.combine(
+                    booking_date,
+                    start_time,
+                ) + timedelta(hours=hours)
 
                 if end_datetime.date() != booking_date:
                     form.add_error(
                         "hours",
                         "Booking cannot continue into the next day.",
                     )
-
                 else:
                     end_time = end_datetime.time()
 
-                    available = is_booking_available(
+                    if not is_booking_available(
                         gaming_room,
                         booking_date,
                         start_time,
                         end_time,
-                    )
-
-                    if not available:
+                    ):
                         form.add_error(
                             None,
                             "This time slot is already booked.",
                         )
-
                     else:
                         total_price = calculate_booking_price(
                             gaming_room,
                             hours,
                         )
 
-                        booking = form.save(
-                            commit=False,
-                        )
-
-                        booking.user = request.user
-                        booking.gaming_room = gaming_room
-                        booking.selected_game = selected_game
-                        booking.end_time = end_time
-                        booking.total_price = total_price
-                        booking.save()
-
-                        Payment.objects.create(
-                            booking=booking,
-                            amount=total_price,
-                            transaction_id=generate_transaction_id(),
-                        )
-
-                        messages.success(
+                        return render(
                             request,
-                            "Your booking has been created.",
-                        )
-
-                        return redirect(
-                            "main:booking_detail",
-                            booking_id=booking.pk,
+                            "booking_confirmation.html",
+                            {
+                                "form": form,
+                                "gaming_room": gaming_room,
+                                "booking_date": booking_date,
+                                "start_time": start_time,
+                                "end_time": end_time,
+                                "hours": hours,
+                                "selected_game": selected_game,
+                                "total_price": total_price,
+                            },
                         )
     else:
         form = BookingForm(
             gaming_room=gaming_room,
-            initial={
-                "gaming_room": gaming_room,
-            },
         )
 
     return render(
@@ -564,6 +521,139 @@ def booking_create(request, slug):
             "form": form,
             "gaming_room": gaming_room,
         },
+    )
+
+
+@login_required
+@transaction.atomic
+def booking_confirm(request, slug):
+    """
+    Step 2: create the booking only after explicit confirmation.
+    The submitted data is validated again so the confirmation screen
+    cannot be used to bypass availability or booking rules.
+    """
+    gaming_room = get_object_or_404(
+        GamingRoom,
+        slug=slug,
+        is_available=True,
+    )
+
+    if request.method != "POST":
+        return redirect(
+            "main:booking_create",
+            slug=gaming_room.slug,
+        )
+
+    form = BookingForm(
+        request.POST,
+        gaming_room=gaming_room,
+    )
+
+    if not form.is_valid():
+        messages.error(
+            request,
+            "Please review your booking details and try again.",
+        )
+        return render(
+            request,
+            "booking.html",
+            {
+                "form": form,
+                "gaming_room": gaming_room,
+            },
+            status=400,
+        )
+
+    booking_date = form.cleaned_data["booking_date"]
+    start_time = form.cleaned_data["start_time"]
+    hours = form.cleaned_data["hours"]
+    selected_game = form.cleaned_data["selected_game"]
+
+    if not gaming_room.games.filter(
+        pk=selected_game.pk,
+    ).exists():
+        form.add_error(
+            "selected_game",
+            "This game is not available in this Gaming Room.",
+        )
+
+    elif booking_date < datetime.now().date():
+        form.add_error(
+            "booking_date",
+            "Booking date cannot be in the past.",
+        )
+
+    else:
+        from datetime import timedelta
+
+        end_datetime = datetime.combine(
+            booking_date,
+            start_time,
+        ) + timedelta(hours=hours)
+
+        if end_datetime.date() != booking_date:
+            form.add_error(
+                "hours",
+                "Booking cannot continue into the next day.",
+            )
+        else:
+            end_time = end_datetime.time()
+
+            if not is_booking_available(
+                gaming_room,
+                booking_date,
+                start_time,
+                end_time,
+            ):
+                form.add_error(
+                    None,
+                    "This time slot is no longer available. Please choose another time.",
+                )
+            else:
+                total_price = calculate_booking_price(
+                    gaming_room,
+                    hours,
+                )
+
+                booking = form.save(
+                    commit=False,
+                )
+                booking.user = request.user
+                booking.gaming_room = gaming_room
+                booking.selected_game = selected_game
+                booking.end_time = end_time
+                booking.total_price = total_price
+                booking.save()
+
+                Payment.objects.create(
+                    booking=booking,
+                    amount=total_price,
+                    transaction_id=generate_transaction_id(),
+                )
+
+                messages.success(
+                    request,
+                    "Your booking has been confirmed.",
+                )
+
+                return redirect(
+                    "main:booking_detail",
+                    booking_id=booking.pk,
+                )
+
+    messages.error(
+        request,
+        "The booking could not be confirmed. Please review the details.",
+    )
+
+    return render(
+        request,
+        "booking.html",
+        {
+            "form": form,
+            "gaming_room": gaming_room,
+        },
+        status=400,
     )
 
 
@@ -746,49 +836,42 @@ def review_create(request, slug):
         gaming_room=gaming_room,
     ).first()
 
-    if request.method != "POST":
-        return redirect(
-            "main:gaming_room_detail",
-            slug=slug,
-        )
-
     if review:
-        form = ReviewForm(
-            request.POST,
-            instance=review,
+        return redirect(
+            "main:review_edit",
+            review_id=review.id,
         )
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.gaming_room = gaming_room
+            review.save()
+
+            update_gaming_room_rating(gaming_room)
+
+            messages.success(
+                request,
+                "Your review has been published.",
+            )
+
+            return redirect(
+                "main:gaming_room_detail",
+                slug=gaming_room.slug,
+            )
     else:
-        form = ReviewForm(
-            request.POST,
-        )
+        form = ReviewForm()
 
-    if form.is_valid():
-        review = form.save(
-            commit=False,
-        )
-
-        review.user = request.user
-        review.gaming_room = gaming_room
-        review.save()
-
-        update_gaming_room_rating(
-            gaming_room,
-        )
-
-        messages.success(
-            request,
-            "Your review has been saved.",
-        )
-
-    else:
-        messages.error(
-            request,
-            "Please correct the review form.",
-        )
-
-    return redirect(
-        "main:gaming_room_detail",
-        slug=slug,
+    return render(
+        request,
+        "review_create.html",
+        {
+            "form": form,
+            "gaming_room": gaming_room,
+        },
     )
 
 
@@ -919,14 +1002,44 @@ def favorites(request):
 
 @login_required
 def chat(request):
+    """
+    Chat inbox and user search.
+
+    The old implementation passed raw Message objects as `conversations`,
+    while the template expected conversation.user / last_message /
+    unread_count. It also ignored the `q` search parameter completely.
+
+    This implementation:
+    - searches users by username;
+    - opens the chat automatically when the search is an exact username;
+    - shows matching users when there are several matches;
+    - builds a real conversation list with the latest message and unread count.
+    """
+    query = request.GET.get("q", "").strip()
+
     users = (
         User.objects
         .filter(is_active=True)
         .exclude(pk=request.user.pk)
+        .select_related("profile")
         .order_by("username")
     )
 
-    conversations = (
+    if query:
+        users = users.filter(username__icontains=query)
+
+        # If the entered username matches exactly, go straight to that chat.
+        exact_user = users.filter(username__iexact=query).first()
+        if exact_user:
+            return redirect(
+                "main:chat_with_user",
+                user_id=exact_user.pk,
+            )
+
+    search_results = list(users[:50])
+
+    # Build one inbox item per person with whom the current user has a message.
+    message_queryset = (
         Message.objects
         .filter(
             Q(sender=request.user)
@@ -939,11 +1052,51 @@ def chat(request):
         .order_by("-created_at")
     )
 
+    conversations_by_user = {}
+
+    for message in message_queryset:
+        other_user = (
+            message.receiver
+            if message.sender_id == request.user.id
+            else message.sender
+        )
+
+        if other_user.id not in conversations_by_user:
+            conversations_by_user[other_user.id] = {
+                "user": other_user,
+                "last_message": message,
+                "unread_count": 0,
+            }
+
+    # Count unread messages separately so the inbox stays correct even when
+    # the newest message in a conversation was sent by the current user.
+    unread_rows = (
+        Message.objects
+        .filter(
+            receiver=request.user,
+            is_read=False,
+        )
+        .values("sender_id")
+    )
+
+    for row in unread_rows:
+        conversation = conversations_by_user.get(row["sender_id"])
+        if conversation:
+            conversation["unread_count"] += 1
+
+    conversations = sorted(
+        conversations_by_user.values(),
+        key=lambda item: item["last_message"].created_at,
+        reverse=True,
+    )
+
     return render(
         request,
         "chat.html",
         {
-            "users": users,
+            "users": search_results,
+            "search_results": search_results,
+            "query": query,
             "conversations": conversations,
         },
     )

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirm Booking | {{ gaming_room.title }} | PS Lounge{% endblock %}
+
+{% block content %}
+<section class="booking-detail-page">
+    <div class="container">
+        <div class="booking-detail-page__header">
+            <div>
+                <span class="booking-detail-page__eyebrow">Confirmation</span>
+                <h1 class="booking-detail-page__title">Confirm Your Booking</h1>
+                <p class="booking-detail-page__description">
+                    Please check the details below before creating your reservation.
+                </p>
+            </div>
+
+            <a class="button button--secondary"
+               href="{% url 'main:booking_create' gaming_room.slug %}">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back To Booking
+            </a>
+        </div>
+
+        <div class="booking-detail-page__grid">
+            <main class="booking-detail-card">
+                <div class="booking-detail-card__top">
+                    <div>
+                        <span class="booking-detail-card__subtitle">Gaming Session</span>
+                        <h2 class="booking-detail-card__title">{{ gaming_room.title }}</h2>
+                    </div>
+
+                    <div class="booking-status booking-status--pending">
+                        <i class="fa-regular fa-clock"></i>
+                        <span>Ready To Confirm</span>
+                    </div>
+                </div>
+
+                <div class="booking-detail-card__divider"></div>
+
+                <div class="booking-detail-card__section">
+                    <div class="booking-detail-card__section-header">
+                        <span>Reservation Details</span>
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
+
+                    <div class="booking-detail-info-grid">
+                        <div class="booking-detail-info">
+                            <span>Date</span>
+                            <strong>{{ booking_date|date:"d.m.Y" }}</strong>
+                        </div>
+
+                        <div class="booking-detail-info">
+                            <span>Start Time</span>
+                            <strong>{{ start_time|time:"H:i" }}</strong>
+                        </div>
+
+                        <div class="booking-detail-info">
+                            <span>End Time</span>
+                            <strong>{{ end_time|time:"H:i" }}</strong>
+                        </div>
+
+                        <div class="booking-detail-info">
+                            <span>Duration</span>
+                            <strong>{{ hours }} hour{{ hours|pluralize }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-detail-card__section">
+                    <div class="booking-detail-card__section-header">
+                        <span>Gaming Details</span>
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+
+                    <div class="booking-game">
+                        <div class="booking-game__icon">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+
+                        <div>
+                            <span>Selected Game</span>
+                            <h3>{{ selected_game.title }}</h3>
+                            {% if selected_game.genre %}
+                                <p>{{ selected_game.genre }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-detail-card__actions">
+                    <a class="button button--secondary"
+                       href="{% url 'main:booking_create' gaming_room.slug %}">
+                        <i class="fa-solid fa-pen"></i>
+                        Edit Booking
+                    </a>
+
+                    <form method="post"
+                          action="{% url 'main:booking_confirm' gaming_room.slug %}"
+                          data-prevent-double-submit>
+                        {% csrf_token %}
+
+                        <input type="hidden" name="selected_game" value="{{ selected_game.pk }}">
+                        <input type="hidden" name="booking_date" value="{{ booking_date|date:'Y-m-d' }}">
+                        <input type="hidden" name="start_time" value="{{ start_time|time:'H:i' }}">
+                        <input type="hidden" name="hours" value="{{ hours }}">
+
+                        <button class="button button--primary" type="submit">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Confirm Booking
+                        </button>
+                    </form>
+                </div>
+            </main>
+
+            <aside class="booking-detail-summary">
+                <div class="booking-detail-summary__header">
+                    <span>Payment Summary</span>
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+
+                <div class="booking-detail-summary__room">
+                    {% if gaming_room.image %}
+                        <img src="{{ gaming_room.image.url }}" alt="{{ gaming_room.title }}">
+                    {% else %}
+                        <div class="image-placeholder">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <span>Gaming Room</span>
+                        <strong>{{ gaming_room.title }}</strong>
+                    </div>
+                </div>
+
+                <div class="booking-detail-summary__divider"></div>
+
+                <div class="booking-detail-summary__rows">
+                    <div>
+                        <span>Price per hour</span>
+                        <strong>{{ gaming_room.price_per_hour }} €</strong>
+                    </div>
+
+                    <div>
+                        <span>Duration</span>
+                        <strong>{{ hours }} hour{{ hours|pluralize }}</strong>
+                    </div>
+                </div>
+
+                <div class="booking-detail-summary__total">
+                    <span>Total</span>
+                    <strong>{{ total_price }} €</strong>
+                </div>
+
+                <p class="booking-detail-summary__note">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Your reservation is not created until you press “Confirm Booking”.
+                </p>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

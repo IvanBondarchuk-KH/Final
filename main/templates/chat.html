@@ -33,13 +33,14 @@
                             <label class="chat-search__label" for="chat-search-input">
                                 Search Users
                             </label>
+
                             <div class="chat-search__input">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <input
                                     id="chat-search-input"
                                     type="search"
                                     name="q"
-                                    value="{{ request.GET.q }}"
+                                    value="{{ query }}"
                                     placeholder="Search by username..."
                                     autocomplete="off"
                                 >
@@ -47,15 +48,62 @@
                         </form>
                     </div>
 
+                    {% if query %}
+                        <div class="chat-search-results">
+                            <div class="chat-search-results__header">
+                                <span>Players</span>
+                                <small>{{ search_results|length }} found</small>
+                            </div>
+
+                            {% for user in search_results %}
+                                <a
+                                    class="chat-list__item"
+                                    href="{% url 'main:chat_with_user' user.id %}"
+                                >
+                                    <div class="chat-list__avatar">
+                                        {% if user.profile.avatar %}
+                                            <img
+                                                src="{{ user.profile.avatar.url }}"
+                                                alt="{{ user.username }}"
+                                            >
+                                        {% else %}
+                                            {{ user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="chat-list__content">
+                                        <div class="chat-list__top">
+                                            <h3>{{ user.username }}</h3>
+                                        </div>
+                                        <div class="chat-list__bottom">
+                                            <p>Open conversation</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% empty %}
+                                <div class="chat-list__empty">
+                                    <div class="chat-list__empty-icon">
+                                        <i class="fa-solid fa-user-slash"></i>
+                                    </div>
+                                    <h3>User Not Found</h3>
+                                    <p>No active user matches “{{ query }}”.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
                     <div class="chat-list">
                         {% for conversation in conversations %}
                             <a
-                                class="chat-list__item {% if selected_user and selected_user.id == conversation.user.id %}chat-list__item--active{% endif %}"
+                                class="chat-list__item"
                                 href="{% url 'main:chat_with_user' conversation.user.id %}"
                             >
                                 <div class="chat-list__avatar">
                                     {% if conversation.user.profile.avatar %}
-                                        <img src="{{ conversation.user.profile.avatar.url }}" alt="{{ conversation.user.username }}">
+                                        <img
+                                            src="{{ conversation.user.profile.avatar.url }}"
+                                            alt="{{ conversation.user.username }}"
+                                        >
                                     {% else %}
                                         {{ conversation.user.username|first|upper }}
                                     {% endif %}
@@ -65,7 +113,9 @@
                                     <div class="chat-list__top">
                                         <h3>{{ conversation.user.username }}</h3>
                                         {% if conversation.last_message %}
-                                            <time>{{ conversation.last_message.created_at|date:"H:i" }}</time>
+                                            <time>
+                                                {{ conversation.last_message.created_at|date:"H:i" }}
+                                            </time>
                                         {% endif %}
                                     </div>
 
@@ -83,153 +133,63 @@
                                                 {% endif %}
                                             </p>
                                         {% else %}
-                                            <p class="chat-list__empty-message">Start a conversation</p>
+                                            <p class="chat-list__empty-message">
+                                                Start a conversation
+                                            </p>
                                         {% endif %}
 
                                         {% if conversation.unread_count %}
-                                            <span class="chat-list__unread">{{ conversation.unread_count }}</span>
+                                            <span class="chat-list__unread">
+                                                {{ conversation.unread_count }}
+                                            </span>
                                         {% endif %}
                                     </div>
                                 </div>
                             </a>
                         {% empty %}
-                            <div class="chat-list__empty">
-                                <div class="chat-list__empty-icon">
-                                    <i class="fa-regular fa-comment-dots"></i>
+                            {% if not query %}
+                                <div class="chat-list__empty">
+                                    <div class="chat-list__empty-icon">
+                                        <i class="fa-regular fa-comment-dots"></i>
+                                    </div>
+                                    <h3>No Conversations</h3>
+                                    <p>Search for a player above to start chatting.</p>
                                 </div>
-                                <h3>No Conversations</h3>
-                                <p>Search for a player to start chatting.</p>
-                            </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </aside>
 
                 <main class="chat-main">
-                    {% if selected_user %}
-                        <div class="chat-main__header">
-                            <div class="chat-main__user">
-                                <div class="chat-main__avatar">
-                                    {% if selected_user.profile.avatar %}
-                                        <img src="{{ selected_user.profile.avatar.url }}" alt="{{ selected_user.username }}">
-                                    {% else %}
-                                        {{ selected_user.username|first|upper }}
-                                    {% endif %}
-                                </div>
+                    <div class="chat-welcome">
+                        <div class="chat-welcome__icon">
+                            <i class="fa-regular fa-comments"></i>
+                        </div>
 
-                                <div>
-                                    <span>Player</span>
-                                    <h2>{{ selected_user.username }}</h2>
-                                </div>
+                        <span class="chat-welcome__eyebrow">PS Lounge Chat</span>
+                        <h2>Your Gaming Community</h2>
+                        <p>
+                            Search for a username above, then select the player
+                            to open a private conversation.
+                        </p>
+
+                        <div class="chat-welcome__features">
+                            <div>
+                                <i class="fa-solid fa-user-group"></i>
+                                <span>Player Chat</span>
                             </div>
 
-                            <a class="chat-main__profile" href="{% url 'main:profile' %}">
-                                <i class="fa-regular fa-user"></i> Profile
-                            </a>
-                        </div>
-
-                        <div class="chat-messages">
-                            {% for message in messages %}
-                                <article class="chat-message {% if message.sender == request.user %}chat-message--sent{% else %}chat-message--received{% endif %}">
-                                    <div class="chat-message__avatar">
-                                        {% if message.sender.profile.avatar %}
-                                            <img src="{{ message.sender.profile.avatar.url }}" alt="{{ message.sender.username }}">
-                                        {% else %}
-                                            {{ message.sender.username|first|upper }}
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="chat-message__content">
-                                        <div class="chat-message__bubble">
-                                            {% if message.image %}
-                                                <a href="{{ message.image.url }}" target="_blank" rel="noopener noreferrer" class="chat-message__image">
-                                                    <img src="{{ message.image.url }}" alt="Message image">
-                                                </a>
-                                            {% endif %}
-
-                                            {% if message.text %}
-                                                <p>{{ message.text|linebreaksbr }}</p>
-                                            {% endif %}
-                                        </div>
-
-                                        <div class="chat-message__meta">
-                                            <time>{{ message.created_at|date:"d.m.Y H:i" }}</time>
-
-                                            {% if message.sender == request.user %}
-                                                {% if message.is_read %}
-                                                    <span class="chat-message__read">
-                                                        <i class="fa-solid fa-check-double"></i> Read
-                                                    </span>
-                                                {% else %}
-                                                    <span>
-                                                        <i class="fa-solid fa-check"></i> Sent
-                                                    </span>
-                                                {% endif %}
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </article>
-                            {% empty %}
-                                <div class="chat-messages__empty">
-                                    <div class="chat-messages__empty-icon">
-                                        <i class="fa-regular fa-comments"></i>
-                                    </div>
-                                    <h3>Start A Conversation</h3>
-                                    <p>Send the first message to {{ selected_user.username }}.</p>
-                                </div>
-                            {% endfor %}
-                        </div>
-
-                        <div class="chat-composer">
-                            <form method="post" action="{% url 'main:send_message' selected_user.id %}" enctype="multipart/form-data">
-                                {% csrf_token %}
-
-                                <div class="chat-composer__attachment">
-                                    <label for="chat-image" title="Attach image">
-                                        <i class="fa-solid fa-paperclip"></i>
-                                    </label>
-                                    <input id="chat-image" type="file" name="image" accept="image/*">
-                                </div>
-
-                                <div class="chat-composer__field">
-                                    <label for="chat-message" class="sr-only">Message</label>
-                                    <textarea id="chat-message" name="text" rows="1" placeholder="Write a message..." maxlength="5000"></textarea>
-                                </div>
-
-                                <button class="chat-composer__send" type="submit" aria-label="Send message">
-                                    <i class="fa-solid fa-paper-plane"></i>
-                                </button>
-                            </form>
-                        </div>
-                    {% else %}
-                        <div class="chat-welcome">
-                            <div class="chat-welcome__icon">
-                                <i class="fa-regular fa-comments"></i>
+                            <div>
+                                <i class="fa-solid fa-headset"></i>
+                                <span>Admin Support</span>
                             </div>
 
-                            <span class="chat-welcome__eyebrow">PS Lounge Chat</span>
-                            <h2>Your Gaming Community</h2>
-                            <p>
-                                Select a conversation from the left or search for another player to start chatting.
-                            </p>
-
-                            <div class="chat-welcome__features">
-                                <div>
-                                    <i class="fa-solid fa-user-group"></i>
-                                    <span>Player Chat</span>
-                                </div>
-
-                                <div>
-                                    <i class="fa-solid fa-headset"></i>
-                                    <span>Admin Support</span>
-                                </div>
-
-                                <div>
-                                    <i class="fa-regular fa-image"></i>
-                                    <span>Image Sharing</span>
-                                </div>
+                            <div>
+                                <i class="fa-regular fa-image"></i>
+                                <span>Image Sharing</span>
                             </div>
                         </div>
-                    {% endif %}
+                    </div>
                 </main>
             </div>
         </div>

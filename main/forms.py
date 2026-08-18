@@ -175,7 +175,6 @@ class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = (
-            "gaming_room",
             "selected_game",
             "booking_date",
             "start_time",
@@ -202,18 +201,6 @@ class BookingForm(forms.ModelForm):
         )
 
         super().__init__(*args, **kwargs)
-
-        if gaming_room is not None:
-            self.fields["gaming_room"].queryset = (
-                GamingRoom.objects.filter(
-                    pk=gaming_room.pk,
-                    is_available=True,
-                )
-            )
-
-            self.fields["selected_game"].queryset = (
-                gaming_room.games.all()
-            )
 
     def clean_hours(self):
         hours = self.cleaned_data["hours"]

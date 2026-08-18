@@ -6,9 +6,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-g-5!4b5w)2v!#42=aoo3y7x_r=$t5@d-t%khdi1yyolc_j849q"
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -24,6 +24,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -110,6 +113,14 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": (
+            "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        ),
+    },
+}
+
 
 MEDIA_URL = "media/"
 
@@ -124,3 +135,7 @@ LOGIN_URL = "main:login"
 LOGIN_REDIRECT_URL = "main:profile"
 
 LOGOUT_REDIRECT_URL = "main:home"
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.onrender.com",
+]
